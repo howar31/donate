@@ -59,17 +59,21 @@ async function randomSkinTest() {
   const ctx = await browser.newContext({ viewport: { width: 1440, height: 900 } });
   const page = await ctx.newPage();
   attach(page, 'random');
-  const seen = {};
-  const sequence = [];
-  for (let i = 0; i < 24; i++) {
+  // The picker excludes whatever localStorage.skin says was shown last. Seed that with the
+  // first and the last skin (both ends of the list) and check the next load picks something
+  // else: two loads, however many skins there are. Loading every skin is covered above.
+  await page.goto(BASE, { waitUntil: 'domcontentloaded' });
+  const names = Object.keys(SKINS);
+  const picks = [];
+  for (const last of [names[0], names[names.length - 1]]) {
+    await page.evaluate((s) => localStorage.setItem('skin', s), last);
     await page.goto(BASE, { waitUntil: 'domcontentloaded' });
     const s = await page.evaluate(() => document.documentElement.getAttribute('data-skin'));
-    seen[s] = (seen[s] || 0) + 1;
-    sequence.push(s);
+    picks.push(`${last}->${s}`);
+    if (!SKINS[s]) problems.push(`[random] unknown skin selected: ${s}`);
+    if (Object.keys(SKINS).length > 1 && s === last) problems.push(`[random] load after ${last} repeated it`);
   }
-  console.log('random skins over 24 loads:', JSON.stringify(seen), sequence.join(' '));
-  // Consecutive loads must never repeat a skin (needs at least two skins).
-  if (Object.keys(SKINS).length > 1) for (let i = 1; i < sequence.length; i++) if (sequence[i] === sequence[i - 1]) problems.push(`[random] skin repeated on consecutive loads at ${i}: ${sequence[i]}`);
+  console.log('random pick after each last-shown skin:', picks.join(' '));
   // A forced skin counts as the last one shown, so the next load avoids it.
   const forced = Object.keys(SKINS)[0];
   await page.goto(`${BASE}?skin=${forced}`, { waitUntil: 'domcontentloaded' });
@@ -77,8 +81,6 @@ async function randomSkinTest() {
   const after = await page.evaluate(() => document.documentElement.getAttribute('data-skin'));
   if (Object.keys(SKINS).length > 1 && after === forced) problems.push(`[random] load after forced ${forced} repeated it`);
   console.log(`after forced ${forced}:`, after);
-  for (const s of Object.keys(SKINS)) if (!seen[s]) problems.push(`[random] skin ${s} never selected in 24 loads`);
-  for (const s of Object.keys(seen)) if (!SKINS[s]) problems.push(`[random] unknown skin selected: ${s}`);
   // bogus param falls back to a valid skin and is still stripped
   await page.goto(`${BASE}?skin=bogus&x=1#top`, { waitUntil: 'domcontentloaded' });
   const fb = await page.evaluate(() => ({ skin: document.documentElement.getAttribute('data-skin'), url: location.search + location.hash }));

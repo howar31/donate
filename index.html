@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="zh-Hant-TW">
+<html lang="zh-Hant-TW" data-skin="tuscan">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -14,60 +14,14 @@
   <meta property="og:url" content="https://donate.howar31.com/">
   <meta name="theme-color" content="#f1e4cc" media="(prefers-color-scheme: light)">
   <meta name="theme-color" content="#2b1d13" media="(prefers-color-scheme: dark)">
-  <script>
-    // Apply the stored theme before first paint to avoid a flash of the wrong theme.
-    (function () {
-      try {
-        var t = localStorage.getItem('theme');
-        if (t === 'dark' || t === 'light') document.documentElement.setAttribute('data-theme', t);
-      } catch (e) {}
-    })();
-  </script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600&family=EB+Garamond:wght@400;500&display=swap">
   <style>
-    /* Tuscan palette: parchment walls, terracotta accent, olive labels.
+    /* Shared shell: layout, structure, interaction states.
+       Every color, typeface, size and shape below is read from tokens that the
+       skin stylesheet (skins/<name>.css, attached by the head script for this
+       load) must define. See skins/tuscan.css for the token contract.
        CJK text uses system fonts on purpose (a CJK webfont costs ~700 KB). */
-    :root {
-      color-scheme: light;
-      --bg: #f1e4cc;
-      --glow: #faf1df;
-      --surface: #f8f0e0;
-      --ink: #3a2a1c;
-      --muted: #6f5a45;
-      --faint: #8c775f;
-      --line: #d6c3a3;
-      --accent: #b4532c;
-      --region: #6c6d3b;
-    }
-    @media (prefers-color-scheme: dark) {
-      :root:not([data-theme="light"]) {
-        color-scheme: dark;
-        --bg: #2b1d13;
-        --glow: #46301d;
-        --surface: #372618;
-        --ink: #f1e4cc;
-        --muted: #c9b596;
-        --faint: #a89376;
-        --line: #574230;
-        --accent: #d9834f;
-        --region: #b1b371;
-      }
-    }
-    :root[data-theme="dark"] {
-      color-scheme: dark;
-      --bg: #2b1d13;
-      --glow: #46301d;
-      --surface: #372618;
-      --ink: #f1e4cc;
-      --muted: #c9b596;
-      --faint: #a89376;
-      --line: #574230;
-      --accent: #d9834f;
-      --region: #b1b371;
-    }
-
     *, *::before, *::after { box-sizing: border-box; }
     html { -webkit-text-size-adjust: 100%; }
     body {
@@ -75,10 +29,10 @@
       min-height: 100dvh;
       display: flex;
       flex-direction: column;
-      background: radial-gradient(1100px 520px at 50% -8%, var(--glow), transparent 70%) no-repeat, var(--bg);
+      background: var(--bg);
       color: var(--ink);
-      font-family: 'EB Garamond', 'PingFang TC', 'Microsoft JhengHei', 'Noto Sans TC', 'Noto Sans CJK TC', Georgia, serif;
-      font-size: 17px;
+      font-family: var(--font-body);
+      font-size: var(--font-size-body);
       line-height: 1.6;
       -webkit-font-smoothing: antialiased;
       transition: background-color 0.2s ease, color 0.2s ease;
@@ -155,17 +109,17 @@
     }
     h1 {
       margin: 0 0 14px;
-      font-family: 'Cinzel', 'PingFang TC', 'Microsoft JhengHei', 'Noto Sans TC', 'Noto Sans CJK TC', Georgia, serif;
+      font-family: var(--font-display);
       font-size: clamp(1.875rem, 5vw, 2.75rem);
-      font-weight: 600;
-      letter-spacing: 0.02em;
+      font-weight: var(--display-weight);
+      letter-spacing: var(--display-tracking);
       line-height: 1.25;
       text-wrap: balance;
     }
     .lede {
       margin: 0 auto;
       max-width: 520px;
-      font-size: 1.0625rem;
+      font-size: var(--font-size-lede);
       color: var(--muted);
       line-height: 1.75;
       text-wrap: pretty;
@@ -179,25 +133,32 @@
       padding: 24px 30px;
       background: var(--surface);
       border: 1px solid var(--line);
-      border-radius: 14px;
+      border-radius: var(--radius-card);
+      box-shadow: var(--shadow);
       color: var(--ink);
       transition: border-color 0.15s ease, background-color 0.2s ease, transform 0.15s ease;
     }
-    .channel:hover { color: var(--ink); border-color: var(--accent); }
+    .channel:hover { color: var(--ink); border-color: var(--line-hover); }
     .channel:active { transform: translateY(1px); }
     .channel-text { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
     .region {
-      font-family: 'Cinzel', 'PingFang TC', 'Microsoft JhengHei', 'Noto Sans TC', 'Noto Sans CJK TC', Georgia, serif;
+      font-family: var(--font-label);
       font-size: 0.75rem;
-      font-weight: 600;
-      letter-spacing: 0.2em;
+      font-weight: var(--label-weight);
+      letter-spacing: var(--label-tracking);
       text-transform: uppercase;
       color: var(--region);
     }
-    .channel h2 { margin: 0; font-size: 1.75rem; font-weight: 700; line-height: 1.25; }
-    .channel h2:lang(en) { font-weight: 500; }
-    .channel-note { font-size: 0.9375rem; color: var(--faint); }
-    .channel svg { color: var(--accent); }
+    .channel h2 {
+      margin: 0;
+      font-size: 1.75rem;
+      font-weight: var(--name-weight);
+      letter-spacing: var(--name-tracking);
+      line-height: 1.25;
+    }
+    .channel h2:lang(en) { font-weight: var(--name-weight-latin); }
+    .channel-note { font-size: var(--font-size-note); color: var(--faint); }
+    .channel svg { color: var(--accent); transition: transform 0.2s ease; }
 
     .paypal-link {
       align-self: center;
@@ -230,9 +191,62 @@
       footer { text-align: left; }
     }
     @media (prefers-reduced-motion: reduce) {
-      *, *::before, *::after { transition: none !important; }
+      *, *::before, *::after { transition: none !important; animation: none !important; }
     }
   </style>
+  <script>
+    // Runs before first paint: pick a skin for this load, attach its stylesheet
+    // and fonts, sync theme-color, then apply the stored light/dark choice.
+    // To add a skin: create skins/<name>.css and add one entry here.
+    (function () {
+      var root = document.documentElement;
+      var SKINS = {
+        tuscan: {
+          fonts: 'https://fonts.googleapis.com/css2?family=Cinzel:wght@600&family=EB+Garamond:wght@400;500&display=swap',
+          light: '#f1e4cc',
+          dark: '#2b1d13'
+        }
+      };
+      var names = Object.keys(SKINS);
+      var skin = null;
+      var match = /[?&]skin=([^&#]*)/.exec(location.search);
+      if (match) {
+        skin = decodeURIComponent(match[1]);
+        // The parameter applies to this load only; drop it so shared links stay clean.
+        try {
+          var rest = location.search.replace(/([?&])skin=[^&#]*&?/, '$1').replace(/[?&]$/, '');
+          history.replaceState(null, '', location.pathname + rest + location.hash);
+        } catch (e) {}
+      }
+      if (!Object.prototype.hasOwnProperty.call(SKINS, skin)) skin = names[Math.floor(Math.random() * names.length)];
+      root.setAttribute('data-skin', skin);
+
+      function attach(href) {
+        var link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.href = href;
+        link.setAttribute('blocking', 'render');
+        document.head.appendChild(link);
+      }
+      attach('skins/' + skin + '.css');
+      attach(SKINS[skin].fonts);
+
+      var metas = document.querySelectorAll('meta[name="theme-color"]');
+      for (var i = 0; i < metas.length; i++) {
+        var dark = /dark/.test(metas[i].getAttribute('media') || '');
+        metas[i].setAttribute('content', dark ? SKINS[skin].dark : SKINS[skin].light);
+      }
+
+      try {
+        var t = localStorage.getItem('theme');
+        if (t === 'dark' || t === 'light') root.setAttribute('data-theme', t);
+      } catch (e) {}
+    })();
+  </script>
+  <noscript>
+    <link rel="stylesheet" href="skins/tuscan.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600&family=EB+Garamond:wght@400;500&display=swap">
+  </noscript>
 </head>
 <body>
   <header class="topbar">

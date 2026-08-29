@@ -43,6 +43,7 @@
     --line-hover: #d9834f;
     --accent: #d9834f;
     --region: #b1b371;
+    --shadow: none;
   }
 }
 :root[data-skin="tuscan"][data-theme="dark"] {
@@ -57,6 +58,7 @@
   --line-hover: #d9834f;
   --accent: #d9834f;
   --region: #b1b371;
+  --shadow: none;
 }
 
 /* A warm glow at the top of the page. */

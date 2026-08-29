@@ -1,0 +1,376 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>贊助 Howar31</title>
+  <meta name="description" content="Howar31 的贊助入口：台灣請使用綠界 ECPay，海外請使用 Ko-fi 或 PayPal。">
+  <link rel="canonical" href="https://donate.howar31.com/">
+  <link rel="icon" href="favicon.ico" sizes="64x64">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="贊助 Howar31">
+  <meta property="og:description" content="台灣請使用綠界 ECPay，海外請使用 Ko-fi 或 PayPal。">
+  <meta property="og:url" content="https://donate.howar31.com/">
+  <meta name="theme-color" content="#f1e4cc" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#2b1d13" media="(prefers-color-scheme: dark)">
+  <script>
+    // Apply the stored theme before first paint to avoid a flash of the wrong theme.
+    (function () {
+      try {
+        var t = localStorage.getItem('theme');
+        if (t === 'dark' || t === 'light') document.documentElement.setAttribute('data-theme', t);
+      } catch (e) {}
+    })();
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600&family=EB+Garamond:wght@400;500&display=swap">
+  <style>
+    /* Tuscan palette: parchment walls, terracotta accent, olive labels.
+       CJK text uses system fonts on purpose (a CJK webfont costs ~700 KB). */
+    :root {
+      color-scheme: light;
+      --bg: #f1e4cc;
+      --glow: #faf1df;
+      --surface: #f8f0e0;
+      --ink: #3a2a1c;
+      --muted: #6f5a45;
+      --faint: #8c775f;
+      --line: #d6c3a3;
+      --accent: #b4532c;
+      --region: #6c6d3b;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        color-scheme: dark;
+        --bg: #2b1d13;
+        --glow: #46301d;
+        --surface: #372618;
+        --ink: #f1e4cc;
+        --muted: #c9b596;
+        --faint: #a89376;
+        --line: #574230;
+        --accent: #d9834f;
+        --region: #b1b371;
+      }
+    }
+    :root[data-theme="dark"] {
+      color-scheme: dark;
+      --bg: #2b1d13;
+      --glow: #46301d;
+      --surface: #372618;
+      --ink: #f1e4cc;
+      --muted: #c9b596;
+      --faint: #a89376;
+      --line: #574230;
+      --accent: #d9834f;
+      --region: #b1b371;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+    html { -webkit-text-size-adjust: 100%; }
+    body {
+      margin: 0;
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      background: radial-gradient(1100px 520px at 50% -8%, var(--glow), transparent 70%) no-repeat, var(--bg);
+      color: var(--ink);
+      font-family: 'EB Garamond', 'PingFang TC', 'Microsoft JhengHei', 'Noto Sans TC', 'Noto Sans CJK TC', Georgia, serif;
+      font-size: 17px;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      transition: background-color 0.2s ease, color 0.2s ease;
+    }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { color: var(--ink); }
+    :focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 6px; }
+    button { font: inherit; color: inherit; cursor: pointer; }
+    svg { display: block; flex-shrink: 0; }
+
+    .topbar {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 10px;
+      padding: 16px clamp(20px, 5vw, 64px);
+    }
+    .lang-switch {
+      display: flex;
+      align-items: center;
+      gap: 2px;
+      padding: 3px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--surface);
+    }
+    .lang-switch button {
+      min-height: 38px;
+      padding: 0 14px;
+      border: 0;
+      border-radius: 999px;
+      background: transparent;
+      color: var(--faint);
+      font-size: 0.8125rem;
+      font-weight: 500;
+      transition: background-color 0.15s ease, color 0.15s ease;
+    }
+    .lang-switch button[aria-pressed="true"] { background: var(--ink); color: var(--bg); }
+    .lang-switch button:hover:not([aria-pressed="true"]) { color: var(--ink); }
+    .theme-switch {
+      width: 44px;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--surface);
+      color: var(--muted);
+      transition: color 0.15s ease, border-color 0.15s ease;
+    }
+    .theme-switch:hover { color: var(--ink); border-color: var(--faint); }
+    .theme-switch .icon-sun { display: none; }
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) .theme-switch .icon-sun { display: block; }
+      :root:not([data-theme="light"]) .theme-switch .icon-moon { display: none; }
+    }
+    :root[data-theme="dark"] .theme-switch .icon-sun { display: block; }
+    :root[data-theme="dark"] .theme-switch .icon-moon { display: none; }
+
+    main {
+      flex: 1;
+      width: 100%;
+      max-width: 640px;
+      margin: 0 auto;
+      padding: clamp(24px, 5vw, 48px) 20px 32px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .hero {
+      text-align: center;
+      padding-bottom: clamp(12px, 3vw, 24px);
+    }
+    h1 {
+      margin: 0 0 14px;
+      font-family: 'Cinzel', 'PingFang TC', 'Microsoft JhengHei', 'Noto Sans TC', 'Noto Sans CJK TC', Georgia, serif;
+      font-size: clamp(1.875rem, 5vw, 2.75rem);
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      line-height: 1.25;
+      text-wrap: balance;
+    }
+    .lede {
+      margin: 0 auto;
+      max-width: 520px;
+      font-size: 1.0625rem;
+      color: var(--muted);
+      line-height: 1.75;
+      text-wrap: pretty;
+    }
+
+    .channel {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      padding: 24px 30px;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      color: var(--ink);
+      transition: border-color 0.15s ease, background-color 0.2s ease, transform 0.15s ease;
+    }
+    .channel:hover { color: var(--ink); border-color: var(--accent); }
+    .channel:active { transform: translateY(1px); }
+    .channel-text { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+    .region {
+      font-family: 'Cinzel', 'PingFang TC', 'Microsoft JhengHei', 'Noto Sans TC', 'Noto Sans CJK TC', Georgia, serif;
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--region);
+    }
+    .channel h2 { margin: 0; font-size: 1.75rem; font-weight: 700; line-height: 1.25; }
+    .channel h2:lang(en) { font-weight: 500; }
+    .channel-note { font-size: 0.9375rem; color: var(--faint); }
+    .channel svg { color: var(--accent); }
+
+    .paypal-link {
+      align-self: center;
+      display: inline-flex;
+      align-items: center;
+      min-height: 40px;
+      font-size: 0.9375rem;
+    }
+
+    footer {
+      max-width: 640px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 8px 20px 28px;
+      text-align: center;
+      font-size: 0.75rem;
+      line-height: 1.8;
+      color: var(--faint);
+      opacity: 0.8;
+    }
+    footer p { margin: 0; }
+    footer p + p { margin-top: 2px; }
+    .contact-link { display: inline-block; padding: 6px 0; color: var(--accent); }
+    .contact-link:hover { color: var(--ink); }
+
+    @media (max-width: 640px) {
+      .channel { padding: 20px 22px; }
+      .channel h2 { font-size: 1.5rem; }
+      .channel-note { font-size: 0.875rem; }
+      footer { text-align: left; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { transition: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="lang-switch" role="group" aria-label="Language">
+      <button type="button" data-lang="zh" aria-pressed="true" lang="zh-Hant-TW">中文</button>
+      <button type="button" data-lang="en" aria-pressed="false" lang="en">EN</button>
+    </div>
+    <button type="button" class="theme-switch" id="theme-switch" data-i18n-aria="theme" aria-label="切換亮暗主題">
+      <svg class="icon-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 13.2A8 8 0 1 1 10.8 4a6.4 6.4 0 0 0 9.2 9.2Z"/></svg>
+      <svg class="icon-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.3 5.3l1.5 1.5M17.2 17.2l1.5 1.5M18.7 5.3l-1.5 1.5M6.8 17.2l-1.5 1.5"/></svg>
+    </button>
+  </header>
+
+  <main>
+    <section class="hero">
+      <h1 data-i18n="title">贊助 Howar31</h1>
+      <p class="lede" data-i18n="lede">如果我的作品替你省下了時間，歡迎打賞一杯咖啡，讓我持續創作。</p>
+    </section>
+
+    <a class="channel ecpay-link" href="https://p.ecpay.com.tw/CC07C66" target="_blank" rel="noopener">
+      <div class="channel-text">
+        <div class="region" data-i18n="ecpayRegion">台灣</div>
+        <h2 data-i18n="ecpayName">綠界 ECPay</h2>
+        <div class="channel-note" data-i18n="ecpayNote">信用卡 · Apple Pay · 台幣</div>
+      </div>
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg>
+    </a>
+
+    <a class="channel kofi-link" href="https://ko-fi.com/howar31" target="_blank" rel="noopener">
+      <div class="channel-text">
+        <div class="region" data-i18n="kofiRegion">國際</div>
+        <h2 data-i18n="kofiName">Ko-fi</h2>
+        <div class="channel-note" data-i18n="kofiNote">PayPal · 美元</div>
+      </div>
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg>
+    </a>
+
+    <a class="paypal-link" href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=MLVT3HDZKUZCW" target="_blank" rel="noopener">
+      <span data-i18n="paypalCta">或直接使用 PayPal</span>
+    </a>
+  </main>
+
+  <footer>
+    <p data-i18n="notice">本頁面之贊助均屬個人創作打賞，非屬公益性質，不開立抵稅收據。</p>
+    <p>© <a class="contact-link" href="https://howar31.com" target="_blank" rel="noopener">Howar31</a></p>
+  </footer>
+
+  <script>
+    (function () {
+      var STRINGS = {
+        zh: {
+          htmlLang: 'zh-Hant-TW',
+          docTitle: '贊助 Howar31',
+          description: 'Howar31 的贊助入口：台灣請使用綠界 ECPay，海外請使用 Ko-fi 或 PayPal。',
+          theme: '切換亮暗主題',
+          title: '贊助 Howar31',
+          lede: '如果我的作品替你省下了時間，歡迎打賞一杯咖啡，讓我持續創作。',
+          ecpayRegion: '台灣',
+          ecpayName: '綠界 ECPay',
+          ecpayNote: '信用卡 · Apple Pay · 台幣',
+          kofiRegion: '國際',
+          kofiName: 'Ko-fi',
+          kofiNote: 'PayPal · 美元',
+          paypalCta: '或直接使用 PayPal',
+          notice: '本頁面之贊助均屬個人創作打賞，非屬公益性質，不開立抵稅收據。'
+        },
+        en: {
+          htmlLang: 'en',
+          docTitle: 'Sponsor Howar31',
+          description: 'Sponsor Howar31: ECPay for Taiwan, Ko-fi or PayPal for everywhere else.',
+          theme: 'Toggle light or dark theme',
+          title: 'Sponsor Howar31',
+          lede: 'If my work saved you an afternoon, a coffee keeps it going.',
+          ecpayRegion: 'Taiwan',
+          ecpayName: 'ECPay 綠界',
+          ecpayNote: 'Credit card · Apple Pay · TWD',
+          kofiRegion: 'International',
+          kofiName: 'Ko-fi',
+          kofiNote: 'PayPal · USD',
+          paypalCta: 'or via PayPal',
+          notice: 'All payments here are personal tips for my creative work, not charitable donations, and not tax-deductible.'
+        }
+      };
+
+      function store(key, value) { try { localStorage.setItem(key, value); } catch (e) {} }
+      function load(key) { try { return localStorage.getItem(key); } catch (e) { return null; } }
+
+      function applyLang(lang) {
+        var s = STRINGS[lang] || STRINGS.zh;
+        document.documentElement.lang = s.htmlLang;
+        document.title = s.docTitle;
+        var meta = document.querySelector('meta[name="description"]');
+        if (meta) meta.setAttribute('content', s.description);
+        var nodes = document.querySelectorAll('[data-i18n]');
+        for (var i = 0; i < nodes.length; i++) {
+          var key = nodes[i].getAttribute('data-i18n');
+          if (s[key] !== undefined) nodes[i].textContent = s[key];
+        }
+        var ariaNodes = document.querySelectorAll('[data-i18n-aria]');
+        for (var j = 0; j < ariaNodes.length; j++) {
+          var ariaKey = ariaNodes[j].getAttribute('data-i18n-aria');
+          if (s[ariaKey] !== undefined) ariaNodes[j].setAttribute('aria-label', s[ariaKey]);
+        }
+        var buttons = document.querySelectorAll('.lang-switch button');
+        for (var k = 0; k < buttons.length; k++) {
+          buttons[k].setAttribute('aria-pressed', buttons[k].getAttribute('data-lang') === lang ? 'true' : 'false');
+        }
+      }
+
+      function detectLang() {
+        var stored = load('lang');
+        if (stored === 'zh' || stored === 'en') return stored;
+        var nav = (navigator.languages && navigator.languages[0]) || navigator.language || '';
+        return /^zh/i.test(nav) ? 'zh' : 'en';
+      }
+
+      var langButtons = document.querySelectorAll('.lang-switch button');
+      for (var b = 0; b < langButtons.length; b++) {
+        langButtons[b].addEventListener('click', function () {
+          var lang = this.getAttribute('data-lang');
+          store('lang', lang);
+          applyLang(lang);
+        });
+      }
+      applyLang(detectLang());
+
+      var mq = window.matchMedia('(prefers-color-scheme: dark)');
+      function effectiveTheme() {
+        var attr = document.documentElement.getAttribute('data-theme');
+        if (attr === 'dark' || attr === 'light') return attr;
+        return mq.matches ? 'dark' : 'light';
+      }
+      document.getElementById('theme-switch').addEventListener('click', function () {
+        var next = effectiveTheme() === 'dark' ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-theme', next);
+        store('theme', next);
+      });
+    })();
+  </script>
+</body>
+</html>

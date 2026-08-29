@@ -1,0 +1,132 @@
+/* Skin: blush. Editorial rosé: cream-rose paper, italic serif headline and lede, sharp-cornered cards
+   with a rose-tinted shadow, an outlined arrow ring that fills on hover; Instrument Serif + Instrument Sans.
+   Token contract: see skins/nebula.css. */
+
+:root[data-skin="blush"] {
+  --font-body: 'Instrument Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang TC', 'Microsoft JhengHei', 'Noto Sans TC', 'Noto Sans CJK TC', sans-serif;
+  --font-display: 'Instrument Serif', 'PingFang TC', 'Microsoft JhengHei', 'Noto Sans TC', 'Noto Sans CJK TC', Georgia, serif;
+  --font-label: var(--font-body);
+  --font-size-body: 16px;
+  --font-size-lede: 1.0625rem;
+  --font-size-note: 0.875rem;
+  --display-weight: 400;
+  --display-tracking: -0.01em;
+  --name-weight: 600;
+  --name-weight-latin: 600;
+  --name-tracking: -0.01em;
+  --label-weight: 600;
+  --label-tracking: 0.14em;
+  --radius-card: 8px;
+
+  color-scheme: light;
+  --bg: #fdf1f4;
+  --surface: #fff8fa;
+  --ink: #2a1219;
+  --muted: #6b4450;
+  --faint: #98707c;
+  --line: #f0cfd8;
+  --line-hover: #e0326e;
+  --accent: #d8235f;
+  --region: #c22a5b;
+  --shadow: 0 1px 2px rgba(216, 35, 95, 0.05), 0 12px 32px rgba(216, 35, 95, 0.10);
+  --surface-hover: #ffeef3;
+  --shadow-hover: 0 2px 4px rgba(216, 35, 95, 0.06), 0 18px 40px rgba(216, 35, 95, 0.16);
+  --bloom: rgba(224, 50, 110, 0.10);
+}
+@media (prefers-color-scheme: dark) {
+  :root[data-skin="blush"]:not([data-theme="light"]) {
+    color-scheme: dark;
+    --bg: #1a0f14;
+    --surface: #24151b;
+    --ink: #fbe9ef;
+    --muted: #d7a9b8;
+    --faint: #a67e8c;
+    --line: #3d2430;
+    --line-hover: #ff7aa8;
+    --accent: #ff7aa8;
+    --region: #ff8fb5;
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 12px 32px rgba(0, 0, 0, 0.35);
+    --surface-hover: #2c1a21;
+    --shadow-hover: 0 2px 4px rgba(0, 0, 0, 0.4), 0 18px 40px rgba(255, 122, 168, 0.12);
+    --bloom: rgba(255, 122, 168, 0.08);
+  }
+}
+:root[data-skin="blush"][data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #1a0f14;
+  --surface: #24151b;
+  --ink: #fbe9ef;
+  --muted: #d7a9b8;
+  --faint: #a67e8c;
+  --line: #3d2430;
+  --line-hover: #ff7aa8;
+  --accent: #ff7aa8;
+  --region: #ff8fb5;
+  --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 12px 32px rgba(0, 0, 0, 0.35);
+  --surface-hover: #2c1a21;
+  --shadow-hover: 0 2px 4px rgba(0, 0, 0, 0.4), 0 18px 40px rgba(255, 122, 168, 0.12);
+  --bloom: rgba(255, 122, 168, 0.08);
+}
+
+/* Ground: a soft rose bloom at the top of the page. */
+[data-skin="blush"] body {
+  background: radial-gradient(900px 480px at 50% -10%, var(--bloom), transparent 65%) no-repeat fixed, var(--bg);
+}
+
+/* Serif headline; Instrument Serif runs small, so the title is sized up. Italic applies to
+   Latin text only (html lang is "en" when EN is selected); CJK stays upright. */
+[data-skin="blush"] h1 {
+  font-size: clamp(2.25rem, 6vw, 3.25rem);
+}
+[data-skin="blush"] h1:lang(en) {
+  font-style: italic;
+}
+/* Lede: body sans for Chinese; the English lede switches to italic serif. */
+[data-skin="blush"] .lede:lang(en) {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 1.25rem;
+  line-height: 1.5;
+}
+/* A short rose rule closes the hero. */
+[data-skin="blush"] .hero::after {
+  content: '';
+  display: block;
+  width: 48px;
+  height: 2px;
+  margin: 22px auto 0;
+  background: var(--accent);
+}
+
+/* Cards: sharp corners, rose-tinted shadow, a faint lift on hover. */
+[data-skin="blush"] .channel {
+  transition: border-color 0.15s ease, background-color 0.2s ease, box-shadow 0.2s ease, transform 0.15s ease;
+}
+[data-skin="blush"] .channel:hover {
+  background: var(--surface-hover);
+  box-shadow: var(--shadow-hover);
+  transform: translateY(-1px);
+}
+[data-skin="blush"] .channel:active {
+  transform: translateY(0);
+  box-shadow: var(--shadow);
+}
+
+/* Arrow ring: outlined at rest, filled on hover. */
+[data-skin="blush"] .channel svg {
+  box-sizing: content-box;
+  padding: 9px;
+  border-radius: 999px;
+  box-shadow: inset 0 0 0 1px var(--accent);
+  color: var(--accent);
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+[data-skin="blush"] .channel:hover svg {
+  background: var(--accent);
+  color: var(--surface);
+}
+
+@media (max-width: 640px) {
+  [data-skin="blush"] .channel { padding: 20px 20px 20px 22px; }
+  [data-skin="blush"] h1 { font-size: clamp(2.125rem, 9vw, 2.5rem); }
+}

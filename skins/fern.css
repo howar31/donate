@@ -1,0 +1,131 @@
+/* Skin: fern. Botanical bookplate on sage linen: woven grain ground, paper cards framed by a
+   double rule, ornament kickers; Fraunces (display) + Figtree.
+   Token contract: see skins/nebula.css. */
+
+:root[data-skin="fern"] {
+  --font-body: 'Figtree', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang TC', 'Microsoft JhengHei', 'Noto Sans TC', 'Noto Sans CJK TC', sans-serif;
+  --font-display: 'Fraunces', 'PingFang TC', 'Microsoft JhengHei', 'Noto Sans TC', 'Noto Sans CJK TC', Georgia, serif;
+  --font-label: var(--font-body);
+  --font-size-body: 16px;
+  --font-size-lede: 1.0625rem;
+  --font-size-note: 0.875rem;
+  --display-weight: 600;
+  --display-tracking: -0.01em;
+  --name-weight: 600;
+  --name-weight-latin: 600;
+  --name-tracking: -0.01em;
+  --label-weight: 600;
+  --label-tracking: 0.14em;
+  --radius-card: 4px;
+
+  color-scheme: light;
+  --bg: #e9eee3;
+  --surface: #f7f9f3;
+  --ink: #1b2e22;
+  --muted: #465a4c;
+  --faint: #6b7d6f;
+  --line: #c4d1bb;
+  --line-hover: #3f7d4e;
+  --accent: #2f6f3f;
+  --region: #5c7a4a;
+  --shadow: 0 1px 2px rgba(27, 46, 34, 0.05), 0 10px 24px rgba(27, 46, 34, 0.07);
+  --frame: #c4d1bb;
+  --frame-hover: #3f7d4e;
+  --grain: 0.5;
+  --grain-blend: multiply;
+  --control-shadow: 0 1px 2px rgba(27, 46, 34, 0.05);
+}
+@media (prefers-color-scheme: dark) {
+  :root[data-skin="fern"]:not([data-theme="light"]) {
+    color-scheme: dark;
+    --bg: #0f1a14;
+    --surface: #16241c;
+    --ink: #e6efe3;
+    --muted: #a9bfae;
+    --faint: #7f9686;
+    --line: #2b3f33;
+    --line-hover: #8fcf9a;
+    --accent: #8fcf9a;
+    --region: #9fbf8c;
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 12px 28px rgba(0, 0, 0, 0.35);
+    --frame: #2b3f33;
+    --frame-hover: #8fcf9a;
+    --grain: 0.28;
+    --grain-blend: soft-light;
+    --control-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+  }
+}
+:root[data-skin="fern"][data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #0f1a14;
+  --surface: #16241c;
+  --ink: #e6efe3;
+  --muted: #a9bfae;
+  --faint: #7f9686;
+  --line: #2b3f33;
+  --line-hover: #8fcf9a;
+  --accent: #8fcf9a;
+  --region: #9fbf8c;
+  --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 12px 28px rgba(0, 0, 0, 0.35);
+  --frame: #2b3f33;
+  --frame-hover: #8fcf9a;
+  --grain: 0.28;
+  --grain-blend: soft-light;
+  --control-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+}
+
+/* Linen: a fixed sheet of monochrome fractal noise laid over the ground. */
+[data-skin="fern"] body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: var(--grain);
+  mix-blend-mode: var(--grain-blend);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.5 0 0 0 0 0.5 0 0 0 0 0.5 0 0 0 0.22 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
+  background-size: 220px 220px;
+}
+[data-skin="fern"] .topbar,
+[data-skin="fern"] main,
+[data-skin="fern"] footer { position: relative; z-index: 1; }
+
+/* Top bar controls sit on the linen like small paper tabs. */
+[data-skin="fern"] .lang-switch,
+[data-skin="fern"] .theme-switch { box-shadow: var(--control-shadow); }
+
+/* Display face at its largest optical size. */
+[data-skin="fern"] h1 { font-variation-settings: 'opsz' 144; }
+
+/* Bookplate cards: a hairline border and an inner rule 4px inside it. */
+[data-skin="fern"] .channel {
+  padding: 26px 30px;
+  border-color: var(--frame);
+  box-shadow: inset 0 0 0 4px var(--surface), inset 0 0 0 5px var(--frame), var(--shadow);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, background-color 0.2s ease, transform 0.15s ease;
+}
+[data-skin="fern"] .channel:hover {
+  border-color: var(--frame-hover);
+  box-shadow: inset 0 0 0 4px var(--surface), inset 0 0 0 5px var(--frame-hover), var(--shadow);
+}
+[data-skin="fern"] .channel:active { transform: translateY(1px); }
+
+/* Kicker ornament: a small lozenge before the region label. */
+[data-skin="fern"] .region::before {
+  content: '';
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  margin-right: 10px;
+  background: currentColor;
+  transform: rotate(45deg);
+  vertical-align: middle;
+  position: relative;
+  top: -1px;
+}
+
+[data-skin="fern"] .channel:hover svg { transform: translateX(3px); }
+
+@media (max-width: 640px) {
+  [data-skin="fern"] .channel { padding: 22px 22px 22px 24px; }
+}

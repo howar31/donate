@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="zh-Hant-TW" data-skin="tuscan">
+<html lang="zh-Hant-TW" data-skin="nebula">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -12,15 +12,15 @@
   <meta property="og:title" content="贊助 Howar31">
   <meta property="og:description" content="台灣請使用綠界 ECPay，海外請使用 Ko-fi 或 PayPal。">
   <meta property="og:url" content="https://donate.howar31.com/">
-  <meta name="theme-color" content="#f1e4cc" media="(prefers-color-scheme: light)">
-  <meta name="theme-color" content="#2b1d13" media="(prefers-color-scheme: dark)">
+  <meta name="theme-color" content="#f8fafc" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#020617" media="(prefers-color-scheme: dark)">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <style>
     /* Shared shell: layout, structure, interaction states.
        Every color, typeface, size and shape below is read from tokens that the
        skin stylesheet (skins/<name>.css, attached by the head script for this
-       load) must define. See skins/tuscan.css for the token contract.
+       load) must define. See skins/nebula.css for the token contract.
        CJK text uses system fonts on purpose (a CJK webfont costs ~700 KB). */
     *, *::before, *::after { box-sizing: border-box; }
     html { -webkit-text-size-adjust: 100%; }
@@ -201,6 +201,11 @@
     (function () {
       var root = document.documentElement;
       var SKINS = {
+        nebula: {
+          fonts: 'https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:wght@400;500;700&family=JetBrains+Mono:wght@400&display=swap',
+          light: '#f8fafc',
+          dark: '#020617'
+        },
         tuscan: {
           fonts: 'https://fonts.googleapis.com/css2?family=Cinzel:wght@600&family=EB+Garamond:wght@400;500&display=swap',
           light: '#f1e4cc',
@@ -244,8 +249,8 @@
     })();
   </script>
   <noscript>
-    <link rel="stylesheet" href="skins/tuscan.css">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600&family=EB+Garamond:wght@400;500&display=swap">
+    <link rel="stylesheet" href="skins/nebula.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:wght@400;500;700&family=JetBrains+Mono:wght@400&display=swap">
   </noscript>
 </head>
 <body>

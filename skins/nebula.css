@@ -1,0 +1,138 @@
+/* Skin: nebula. Slate canvas, violet accent, glass cards, after howar31.com;
+   Atkinson Hyperlegible Next + JetBrains Mono. Dark mirrors the site, light is its daylight counterpart.
+   The default skin: index.html ships with data-skin="nebula" and the <noscript> fallback loads this file.
+
+   Token contract (every skin must define all of these):
+     colors, three times (light / system dark / forced dark):
+       --bg --surface --ink --muted --faint --line --line-hover --accent --region --shadow
+     type and shape, once:
+       --font-body --font-display --font-label
+       --font-size-body --font-size-lede --font-size-note
+       --display-weight --display-tracking --name-weight --name-weight-latin --name-tracking
+       --label-weight --label-tracking --radius-card
+   Anything beyond tokens goes in [data-skin="<name>"] rules at the bottom. */
+
+:root[data-skin="nebula"] {
+  --font-body: 'Atkinson Hyperlegible Next', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang TC', 'Microsoft JhengHei', 'Noto Sans TC', 'Noto Sans CJK TC', sans-serif;
+  --font-display: var(--font-body);
+  --font-label: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --font-size-body: 16px;
+  --font-size-lede: 1rem;
+  --font-size-note: 0.875rem;
+  --display-weight: 700;
+  --display-tracking: -0.02em;
+  --name-weight: 500;
+  --name-weight-latin: 500;
+  --name-tracking: -0.02em;
+  --label-weight: 400;
+  --label-tracking: 0.14em;
+  --radius-card: 12px;
+
+  color-scheme: light;
+  --bg: #f8fafc;
+  --surface: rgba(255, 255, 255, 0.72);
+  --ink: #0f172a;
+  --muted: #475569;
+  --faint: #64748b;
+  --line: #e2e8f0;
+  --line-hover: #a78bfa;
+  --accent: #7c3aed;
+  --region: #64748b;
+  --shadow: 0 1px 2px rgba(15, 23, 42, 0.04), 0 10px 30px rgba(15, 23, 42, 0.06);
+  --rule: rgba(139, 92, 246, 0.7);
+  --grad-a: #2563eb;
+  --grad-b: #7c3aed;
+  --blob-a: rgba(139, 92, 246, 0.16);
+  --blob-b: rgba(59, 130, 246, 0.12);
+}
+@media (prefers-color-scheme: dark) {
+  :root[data-skin="nebula"]:not([data-theme="light"]) {
+    color-scheme: dark;
+    --bg: #020617;
+    --surface: rgba(15, 23, 42, 0.55);
+    --ink: #ffffff;
+    --muted: rgba(255, 255, 255, 0.7);
+    --faint: rgba(255, 255, 255, 0.5);
+    --line: rgba(255, 255, 255, 0.08);
+    --line-hover: rgba(255, 255, 255, 0.2);
+    --accent: #a78bfa;
+    --region: rgba(255, 255, 255, 0.5);
+    --shadow: none;
+    --rule: rgba(167, 139, 250, 0.7);
+    --grad-a: #60a5fa;
+    --grad-b: #a78bfa;
+    --blob-a: rgba(139, 92, 246, 0.15);
+    --blob-b: rgba(168, 85, 247, 0.12);
+  }
+}
+:root[data-skin="nebula"][data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #020617;
+  --surface: rgba(15, 23, 42, 0.55);
+  --ink: #ffffff;
+  --muted: rgba(255, 255, 255, 0.7);
+  --faint: rgba(255, 255, 255, 0.5);
+  --line: rgba(255, 255, 255, 0.08);
+  --line-hover: rgba(255, 255, 255, 0.2);
+  --accent: #a78bfa;
+  --region: rgba(255, 255, 255, 0.5);
+  --shadow: none;
+  --rule: rgba(167, 139, 250, 0.7);
+  --grad-a: #60a5fa;
+  --grad-b: #a78bfa;
+  --blob-a: rgba(139, 92, 246, 0.15);
+  --blob-b: rgba(168, 85, 247, 0.12);
+}
+
+/* Ambient glow: two blurred violet blobs drifting behind the content. */
+[data-skin="nebula"] body::before,
+[data-skin="nebula"] body::after {
+  content: '';
+  position: fixed;
+  z-index: 0;
+  border-radius: 50%;
+  filter: blur(90px);
+  pointer-events: none;
+  will-change: transform;
+}
+[data-skin="nebula"] body::before {
+  top: -18%;
+  left: 32%;
+  width: 640px;
+  height: 640px;
+  background: radial-gradient(circle, var(--blob-a), transparent 70%);
+  animation: nebula-drift-a 18s ease-in-out infinite;
+}
+[data-skin="nebula"] body::after {
+  bottom: -22%;
+  left: -12%;
+  width: 560px;
+  height: 560px;
+  background: radial-gradient(circle, var(--blob-b), transparent 70%);
+  animation: nebula-drift-b 22s ease-in-out infinite;
+}
+@keyframes nebula-drift-a { 0%, 100% { transform: translate(0, 0) scale(1); } 50% { transform: translate(-60px, 40px) scale(1.08); } }
+@keyframes nebula-drift-b { 0%, 100% { transform: translate(0, 0) scale(1); } 50% { transform: translate(70px, -50px) scale(0.94); } }
+[data-skin="nebula"] .topbar,
+[data-skin="nebula"] main,
+[data-skin="nebula"] footer { position: relative; z-index: 1; }
+
+/* Glass surfaces. */
+[data-skin="nebula"] .lang-switch,
+[data-skin="nebula"] .theme-switch,
+[data-skin="nebula"] .channel {
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+}
+
+/* Gradient title, ruled kickers, arrow nudge on hover. */
+[data-skin="nebula"] h1 {
+  background: linear-gradient(90deg, var(--grad-a), var(--grad-b));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+[data-skin="nebula"] .region { display: flex; align-items: center; gap: 10px; }
+[data-skin="nebula"] .region::before { content: ''; width: 22px; height: 1px; background: var(--rule); flex-shrink: 0; }
+[data-skin="nebula"] .channel:hover svg { transform: translateX(3px); }

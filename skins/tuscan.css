@@ -1,15 +1,5 @@
 /* Skin: tuscan. Parchment walls, terracotta accent, olive labels; Cinzel + EB Garamond.
-   The default skin: index.html ships with data-skin="tuscan" and the <noscript> fallback loads this file.
-
-   Token contract (every skin must define all of these):
-     colors, three times (light / system dark / forced dark):
-       --bg --surface --ink --muted --faint --line --line-hover --accent --region --shadow
-     type and shape, once:
-       --font-body --font-display --font-label
-       --font-size-body --font-size-lede --font-size-note
-       --display-weight --display-tracking --name-weight --name-weight-latin --name-tracking
-       --label-weight --label-tracking --radius-card
-   Anything beyond tokens goes in [data-skin="<name>"] rules at the bottom. */
+   Token contract: see skins/nebula.css. */
 
 :root[data-skin="tuscan"] {
   --font-body: 'EB Garamond', 'PingFang TC', 'Microsoft JhengHei', 'Noto Sans TC', 'Noto Sans CJK TC', Georgia, serif;

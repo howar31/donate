@@ -1,0 +1,155 @@
+/* Skin: tide. Water: pale aqua ground with a teal-to-cyan mesh, white cards with a gradient edge
+   bar and a gradient arrow disc, a slow wave band at the foot of the viewport; Plus Jakarta Sans.
+   Token contract: see skins/nebula.css. */
+
+:root[data-skin="tide"] {
+  --font-body: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang TC', 'Microsoft JhengHei', 'Noto Sans TC', 'Noto Sans CJK TC', sans-serif;
+  --font-display: var(--font-body);
+  --font-label: var(--font-body);
+  --font-size-body: 16px;
+  --font-size-lede: 1.0625rem;
+  --font-size-note: 0.875rem;
+  --display-weight: 700;
+  --display-tracking: -0.02em;
+  --name-weight: 500;
+  --name-weight-latin: 500;
+  --name-tracking: -0.01em;
+  --label-weight: 500;
+  --label-tracking: 0.12em;
+  --radius-card: 18px;
+
+  color-scheme: light;
+  --bg: #e8f5f6;
+  --surface: #ffffff;
+  --ink: #0b2f36;
+  --muted: #3f6068;
+  --faint: #5f7f86;
+  --line: rgba(11, 47, 54, 0.08);
+  --line-hover: #0e9aa8;
+  --accent: #0f8a98;
+  --region: #0e9aa8;
+  --shadow: 0 1px 2px rgba(11, 47, 54, 0.04), 0 12px 32px rgba(14, 154, 168, 0.10);
+  --shadow-hover: 0 2px 4px rgba(11, 47, 54, 0.05), 0 18px 40px rgba(14, 154, 168, 0.16);
+  --shadow-control: 0 1px 2px rgba(11, 47, 54, 0.05), 0 4px 12px rgba(14, 154, 168, 0.08);
+  --grad-a: #14b8a6;
+  --grad-b: #22d3ee;
+  --mesh-a: rgba(34, 211, 238, 0.28);
+  --mesh-b: rgba(20, 184, 166, 0.20);
+  --wave: rgba(14, 154, 168, 0.10);
+}
+@media (prefers-color-scheme: dark) {
+  :root[data-skin="tide"]:not([data-theme="light"]) {
+    color-scheme: dark;
+    --bg: #07191e;
+    --surface: #0e2a30;
+    --ink: #e6f7f8;
+    --muted: #a3c8cd;
+    --faint: #7aa3aa;
+    --line: rgba(255, 255, 255, 0.08);
+    --line-hover: #3fd4d4;
+    --accent: #3fd4d4;
+    --region: #3fd4d4;
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 12px 32px rgba(0, 0, 0, 0.35);
+    --shadow-hover: 0 2px 4px rgba(0, 0, 0, 0.4), 0 18px 40px rgba(0, 0, 0, 0.45);
+    --shadow-control: 0 1px 2px rgba(0, 0, 0, 0.4), 0 4px 12px rgba(0, 0, 0, 0.3);
+    --grad-a: #14b8a6;
+    --grad-b: #22d3ee;
+    --mesh-a: rgba(34, 211, 238, 0.14);
+    --mesh-b: rgba(20, 184, 166, 0.12);
+    --wave: rgba(63, 212, 212, 0.08);
+  }
+}
+:root[data-skin="tide"][data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #07191e;
+  --surface: #0e2a30;
+  --ink: #e6f7f8;
+  --muted: #a3c8cd;
+  --faint: #7aa3aa;
+  --line: rgba(255, 255, 255, 0.08);
+  --line-hover: #3fd4d4;
+  --accent: #3fd4d4;
+  --region: #3fd4d4;
+  --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 12px 32px rgba(0, 0, 0, 0.35);
+  --shadow-hover: 0 2px 4px rgba(0, 0, 0, 0.4), 0 18px 40px rgba(0, 0, 0, 0.45);
+  --shadow-control: 0 1px 2px rgba(0, 0, 0, 0.4), 0 4px 12px rgba(0, 0, 0, 0.3);
+  --grad-a: #14b8a6;
+  --grad-b: #22d3ee;
+  --mesh-a: rgba(34, 211, 238, 0.14);
+  --mesh-b: rgba(20, 184, 166, 0.12);
+  --wave: rgba(63, 212, 212, 0.08);
+}
+
+/* Mesh ground: two soft teal/cyan pools at the top corners. */
+[data-skin="tide"] body {
+  background:
+    radial-gradient(900px 520px at 85% -10%, var(--mesh-a), transparent 65%) no-repeat fixed,
+    radial-gradient(700px 480px at 5% 10%, var(--mesh-b), transparent 65%) no-repeat fixed,
+    var(--bg);
+}
+
+/* Wave band: a masked strip of colour drifting along the foot of the viewport. */
+[data-skin="tide"] body::after {
+  content: '';
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 120px;
+  z-index: 0;
+  pointer-events: none;
+  background: var(--wave);
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 120' preserveAspectRatio='none'%3E%3Cpath d='M0 48 C 100 12, 100 84, 200 48 S 300 12, 400 48 L 400 120 L 0 120 Z' fill='%23000'/%3E%3C/svg%3E");
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 120' preserveAspectRatio='none'%3E%3Cpath d='M0 48 C 100 12, 100 84, 200 48 S 300 12, 400 48 L 400 120 L 0 120 Z' fill='%23000'/%3E%3C/svg%3E");
+  -webkit-mask-repeat: repeat-x;
+  mask-repeat: repeat-x;
+  -webkit-mask-size: 400px 120px;
+  mask-size: 400px 120px;
+  -webkit-mask-position: 0 bottom;
+  mask-position: 0 bottom;
+  animation: tide-drift 16s linear infinite;
+}
+@keyframes tide-drift {
+  to { -webkit-mask-position: -400px bottom; mask-position: -400px bottom; }
+}
+[data-skin="tide"] .topbar,
+[data-skin="tide"] main,
+[data-skin="tide"] footer { position: relative; z-index: 1; }
+
+/* Top bar controls share the card material. */
+[data-skin="tide"] .lang-switch,
+[data-skin="tide"] .theme-switch { box-shadow: var(--shadow-control); }
+
+/* Cards: gradient edge bar on the left, lift on hover, press stays downward. */
+[data-skin="tide"] .channel {
+  position: relative;
+  overflow: hidden;
+  padding: 24px 26px 24px 34px;
+  transition: border-color 0.15s ease, box-shadow 0.2s ease, transform 0.15s ease;
+}
+[data-skin="tide"] .channel::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 5px;
+  background: linear-gradient(180deg, var(--grad-a), var(--grad-b));
+}
+[data-skin="tide"] .channel:hover { transform: translateY(-1px); box-shadow: var(--shadow-hover); }
+[data-skin="tide"] .channel:active { transform: translateY(0); box-shadow: var(--shadow); }
+
+/* Arrow disc: teal-to-cyan gradient, white glyph, nudges right on hover. */
+[data-skin="tide"] .channel svg {
+  box-sizing: content-box;
+  padding: 9px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, var(--grad-a), var(--grad-b));
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(20, 184, 166, 0.28);
+}
+[data-skin="tide"] .channel:hover svg { transform: translateX(2px); }
+
+@media (max-width: 640px) {
+  [data-skin="tide"] .channel { padding: 20px 20px 20px 26px; }
+}

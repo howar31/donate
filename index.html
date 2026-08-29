@@ -195,8 +195,9 @@
     }
   </style>
   <script>
-    // Runs before first paint: pick a skin for this load, attach its stylesheet
-    // and fonts, sync theme-color, then apply the stored light/dark choice.
+    // Runs before first paint: pick a skin for this load (never the one shown
+    // last time), attach its stylesheet and fonts, sync theme-color, then apply
+    // the stored light/dark choice.
     // To add a skin: create skins/<name>.css and add one entry here.
     (function () {
       var root = document.documentElement;
@@ -223,8 +224,17 @@
           history.replaceState(null, '', location.pathname + rest + location.hash);
         } catch (e) {}
       }
-      if (!Object.prototype.hasOwnProperty.call(SKINS, skin)) skin = names[Math.floor(Math.random() * names.length)];
+      if (!Object.prototype.hasOwnProperty.call(SKINS, skin)) {
+        // Random pick, but never the skin shown last time (stored below).
+        var last = null;
+        try { last = localStorage.getItem('skin'); } catch (e) {}
+        var pool = [];
+        for (var n = 0; n < names.length; n++) if (names[n] !== last) pool.push(names[n]);
+        if (!pool.length) pool = names;
+        skin = pool[Math.floor(Math.random() * pool.length)];
+      }
       root.setAttribute('data-skin', skin);
+      try { localStorage.setItem('skin', skin); } catch (e) {}
 
       function attach(href) {
         var link = document.createElement('link');

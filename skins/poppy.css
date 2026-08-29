@@ -1,0 +1,168 @@
+/* Skin: poppy. Brick banner: a brick-red field across the top of the page (a tiled brick texture
+   under a translucent tint) that the white cards hang over, red-tinted shadows, a red arrow disc;
+   Manrope. Token contract: see skins/nebula.css. */
+
+:root[data-skin="poppy"] {
+  --font-body: 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang TC', 'Microsoft JhengHei', 'Noto Sans TC', 'Noto Sans CJK TC', sans-serif;
+  --font-display: var(--font-body);
+  --font-label: var(--font-body);
+  --font-size-body: 16px;
+  --font-size-lede: 1.0625rem;
+  --font-size-note: 0.875rem;
+  --display-weight: 700;
+  --display-tracking: -0.02em;
+  --name-weight: 700;
+  --name-weight-latin: 700;
+  --name-tracking: -0.02em;
+  --label-weight: 700;
+  --label-tracking: 0.12em;
+  --radius-card: 16px;
+
+  color-scheme: light;
+  --bg: #faf6f4;
+  --surface: #ffffff;
+  --ink: #241417;
+  --muted: #6a5459;
+  --faint: #957f84;
+  --line: rgba(36, 20, 23, 0.06);
+  --line-hover: #c23745;
+  --accent: #b92d3c;
+  --region: #b92d3c;
+  --shadow: 0 1px 2px rgba(110, 30, 40, 0.05), 0 14px 36px rgba(110, 30, 40, 0.14);
+  --shadow-hover: 0 2px 4px rgba(110, 30, 40, 0.07), 0 20px 44px rgba(110, 30, 40, 0.2);
+  --band-a: #cc3f4c;
+  --band-b: #9d2a37;
+  --tint-a: rgba(204, 63, 76, 0.42);
+  --tint-b: rgba(120, 30, 42, 0.62);
+  --band-glow: rgba(255, 255, 255, 0.18);
+  --on-band: #ffffff;
+  --on-band-muted: rgba(255, 255, 255, 0.84);
+  --chip: #b92d3c;
+  --chip-ink: #ffffff;
+  --chip-hover: #96222f;
+  --control-shadow: 0 2px 8px rgba(80, 20, 30, 0.16);
+}
+@media (prefers-color-scheme: dark) {
+  :root[data-skin="poppy"]:not([data-theme="light"]) {
+    color-scheme: dark;
+    --bg: #140f10;
+    --surface: #1f1819;
+    --ink: #f7ecee;
+    --muted: #c8b3b8;
+    --faint: #96838a;
+    --line: rgba(255, 255, 255, 0.07);
+    --line-hover: #e8717d;
+    --accent: #e8717d;
+    --region: #e8858f;
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 14px 36px rgba(0, 0, 0, 0.45);
+    --shadow-hover: 0 2px 4px rgba(0, 0, 0, 0.4), 0 20px 44px rgba(0, 0, 0, 0.55);
+    --band-a: #a33241;
+    --band-b: #611a26;
+    --tint-a: rgba(90, 22, 32, 0.62);
+    --tint-b: rgba(40, 10, 16, 0.8);
+    --band-glow: rgba(255, 255, 255, 0.1);
+    --on-band: #ffffff;
+    --on-band-muted: rgba(255, 255, 255, 0.82);
+    --chip: #e8717d;
+    --chip-ink: #140f10;
+    --chip-hover: #f08d97;
+    --control-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+  }
+}
+:root[data-skin="poppy"][data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #140f10;
+  --surface: #1f1819;
+  --ink: #f7ecee;
+  --muted: #c8b3b8;
+  --faint: #96838a;
+  --line: rgba(255, 255, 255, 0.07);
+  --line-hover: #e8717d;
+  --accent: #e8717d;
+  --region: #e8858f;
+  --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 14px 36px rgba(0, 0, 0, 0.45);
+  --shadow-hover: 0 2px 4px rgba(0, 0, 0, 0.4), 0 20px 44px rgba(0, 0, 0, 0.55);
+  --band-a: #a33241;
+  --band-b: #611a26;
+  --tint-a: rgba(90, 22, 32, 0.62);
+  --tint-b: rgba(40, 10, 16, 0.8);
+  --band-glow: rgba(255, 255, 255, 0.1);
+  --on-band: #ffffff;
+  --on-band-muted: rgba(255, 255, 255, 0.82);
+  --chip: #e8717d;
+  --chip-ink: #140f10;
+  --chip-hover: #f08d97;
+  --control-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+
+/* The band: a crimson field across the top of the page. The hero sits on it and the first
+   card hangs over its lower edge. */
+[data-skin="poppy"] body { position: relative; }
+[data-skin="poppy"] body::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 340px;
+  background:
+    radial-gradient(700px 320px at 18% 0%, var(--band-glow), transparent 70%),
+    linear-gradient(120deg, var(--tint-a), var(--tint-b)),
+    url('poppy-brick.webp') 0 0 / 480px 240px repeat,
+    var(--band-b);
+  border-radius: 0 0 28px 28px;
+  z-index: 0;
+  pointer-events: none;
+}
+[data-skin="poppy"] .topbar,
+[data-skin="poppy"] main,
+[data-skin="poppy"] footer { position: relative; z-index: 1; }
+
+/* Hero text reads in white on the band. */
+[data-skin="poppy"] h1 { color: var(--on-band); text-shadow: 0 1px 2px rgba(30, 0, 8, 0.6), 0 4px 18px rgba(30, 0, 8, 0.55); }
+[data-skin="poppy"] .lede { color: var(--on-band); text-shadow: 0 1px 2px rgba(30, 0, 8, 0.6), 0 3px 14px rgba(30, 0, 8, 0.55); }
+
+/* Top bar controls float on the band as white pills. */
+[data-skin="poppy"] .lang-switch,
+[data-skin="poppy"] .theme-switch {
+  border-color: transparent;
+  box-shadow: var(--control-shadow);
+}
+[data-skin="poppy"] .theme-switch:hover { border-color: transparent; }
+
+/* Cards: soft, red-tinted shadow; lift on hover, settle on press. */
+[data-skin="poppy"] .channel {
+  transition: border-color 0.15s ease, box-shadow 0.2s ease, transform 0.15s ease;
+}
+[data-skin="poppy"] .channel:hover { transform: translateY(-2px); box-shadow: var(--shadow-hover); }
+[data-skin="poppy"] .channel:active { transform: translateY(0); box-shadow: var(--shadow); }
+
+/* Region label: a small dot in front of the kicker. */
+[data-skin="poppy"] .region::before {
+  content: '';
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  margin-right: 8px;
+  border-radius: 50%;
+  background: currentColor;
+  vertical-align: middle;
+  position: relative;
+  top: -1px;
+}
+
+/* Arrow disc: solid red with a light arrow; darkens and nudges on hover. */
+[data-skin="poppy"] .channel svg {
+  box-sizing: content-box;
+  padding: 9px;
+  border-radius: 999px;
+  background: var(--chip);
+  color: var(--chip-ink);
+  transition: background-color 0.15s ease, transform 0.2s ease;
+}
+[data-skin="poppy"] .channel:hover svg { background: var(--chip-hover); transform: translateX(2px); }
+
+@media (max-width: 640px) {
+  [data-skin="poppy"] body::before { height: 300px; border-radius: 0 0 22px 22px; background-size: auto, auto, 360px 180px, auto; }
+  [data-skin="poppy"] .channel { padding: 20px 20px 20px 22px; }
+}

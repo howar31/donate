@@ -1,0 +1,140 @@
+/* Skin: blueprint. Technical drawing: graph-paper grid ground, white drawing sheets with corner
+   tick marks and mono numbered labels, cobalt on paper (light) or paper on blueprint blue (dark);
+   IBM Plex Sans + IBM Plex Mono. Token contract: see skins/nebula.css. */
+
+:root[data-skin="blueprint"] {
+  --font-body: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang TC', 'Microsoft JhengHei', 'Noto Sans TC', 'Noto Sans CJK TC', sans-serif;
+  --font-display: var(--font-body);
+  --font-label: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, 'PingFang TC', 'Microsoft JhengHei', 'Noto Sans TC', 'Noto Sans CJK TC', monospace;
+  --font-size-body: 16px;
+  --font-size-lede: 1.0625rem;
+  --font-size-note: 0.875rem;
+  --display-weight: 600;
+  --display-tracking: -0.02em;
+  --name-weight: 600;
+  --name-weight-latin: 600;
+  --name-tracking: -0.01em;
+  --label-weight: 500;
+  --label-tracking: 0.12em;
+  --radius-card: 2px;
+
+  color-scheme: light;
+  --bg: #f3f6fc;
+  --surface: #ffffff;
+  --ink: #0c2a5c;
+  --muted: #3b5486;
+  --faint: #6479a3;
+  --line: rgba(29, 78, 216, 0.35);
+  --line-hover: #1d4ed8;
+  --accent: #1d4ed8;
+  --region: #1d4ed8;
+  --shadow: 0 8px 24px rgba(12, 42, 92, 0.08);
+  --grid-minor: rgba(29, 78, 216, 0.08);
+  --grid-major: rgba(29, 78, 216, 0.16);
+  --tick: #1d4ed8;
+}
+@media (prefers-color-scheme: dark) {
+  :root[data-skin="blueprint"]:not([data-theme="light"]) {
+    color-scheme: dark;
+    --bg: #06183d;
+    --surface: #0b2456;
+    --ink: #e8f0ff;
+    --muted: #a9bce6;
+    --faint: #7f95c4;
+    --line: rgba(110, 168, 255, 0.35);
+    --line-hover: #6ea8ff;
+    --accent: #6ea8ff;
+    --region: #8fbaff;
+    --shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+    --grid-minor: rgba(120, 160, 255, 0.09);
+    --grid-major: rgba(120, 160, 255, 0.16);
+    --tick: #6ea8ff;
+  }
+}
+:root[data-skin="blueprint"][data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #06183d;
+  --surface: #0b2456;
+  --ink: #e8f0ff;
+  --muted: #a9bce6;
+  --faint: #7f95c4;
+  --line: rgba(110, 168, 255, 0.35);
+  --line-hover: #6ea8ff;
+  --accent: #6ea8ff;
+  --region: #8fbaff;
+  --shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+  --grid-minor: rgba(120, 160, 255, 0.09);
+  --grid-major: rgba(120, 160, 255, 0.16);
+  --tick: #6ea8ff;
+}
+
+/* Graph-paper ground: a fine 24px grid with a heavier line every 120px. */
+[data-skin="blueprint"] body {
+  background:
+    linear-gradient(var(--grid-major) 1px, transparent 1px) 0 0 / 120px 120px fixed,
+    linear-gradient(90deg, var(--grid-major) 1px, transparent 1px) 0 0 / 120px 120px fixed,
+    linear-gradient(var(--grid-minor) 1px, transparent 1px) 0 0 / 24px 24px fixed,
+    linear-gradient(90deg, var(--grid-minor) 1px, transparent 1px) 0 0 / 24px 24px fixed,
+    var(--bg);
+}
+
+/* Top bar controls follow the drafting look: near-square corners. */
+[data-skin="blueprint"] .lang-switch,
+[data-skin="blueprint"] .theme-switch { border-radius: 4px; }
+[data-skin="blueprint"] .lang-switch button { border-radius: 3px; }
+
+/* Drawing sheets: each card is a numbered sheet with tick marks on two corners. */
+[data-skin="blueprint"] main { counter-reset: channel; }
+[data-skin="blueprint"] .channel {
+  position: relative;
+  counter-increment: channel;
+  padding: 24px 24px 24px 30px;
+}
+[data-skin="blueprint"] .channel::before,
+[data-skin="blueprint"] .channel::after {
+  content: '';
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  pointer-events: none;
+}
+[data-skin="blueprint"] .channel::before {
+  top: -1px;
+  left: -1px;
+  border-top: 2px solid var(--tick);
+  border-left: 2px solid var(--tick);
+}
+[data-skin="blueprint"] .channel::after {
+  right: -1px;
+  bottom: -1px;
+  border-right: 2px solid var(--tick);
+  border-bottom: 2px solid var(--tick);
+}
+
+/* Numbered kicker: "01 | TAIWAN". */
+[data-skin="blueprint"] .region { display: flex; align-items: center; }
+[data-skin="blueprint"] .region::before {
+  content: counter(channel, decimal-leading-zero);
+  margin-right: 10px;
+  padding-right: 10px;
+  border-right: 1px solid currentColor;
+  opacity: 0.8;
+}
+
+/* Arrow in a square chip that fills with the accent on hover. */
+[data-skin="blueprint"] .channel svg {
+  box-sizing: content-box;
+  padding: 9px;
+  border: 1px solid var(--line);
+  border-radius: 2px;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+[data-skin="blueprint"] .channel:hover svg {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--surface);
+}
+
+@media (max-width: 640px) {
+  [data-skin="blueprint"] .channel { padding: 20px 20px 20px 22px; }
+}

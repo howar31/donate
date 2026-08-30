@@ -1,10 +1,10 @@
 """Procedural, seamlessly tileable brick texture (running bond) for the poppy skin band.
 
-Generates skins/poppy-brick.webp. Deterministic: the same seeds always produce the same
+Generates src/skins/poppy-brick.webp. Deterministic: the same seeds always produce the same
 bytes, so re-running is a no-op unless the parameters below change.
 
     python3 -m venv .venv && .venv/bin/pip install numpy pillow
-    .venv/bin/python tools/brick-texture.py skins/poppy-brick.webp [--preview DIR]
+    .venv/bin/python tools/brick-texture.py src/skins/poppy-brick.webp [--preview DIR]
 
 --preview DIR also writes brick-preview.png and a 2x2 brick-tiled.png (seam check) to DIR.
 """
@@ -16,7 +16,7 @@ import numpy as np
 from PIL import Image
 
 args = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-args.add_argument('output', help='path of the WebP tile to write, e.g. skins/poppy-brick.webp')
+args.add_argument('output', help='path of the WebP tile to write, e.g. src/skins/poppy-brick.webp')
 args.add_argument('--preview', metavar='DIR', help='also write brick-preview.png and brick-tiled.png here')
 args = args.parse_args()
 

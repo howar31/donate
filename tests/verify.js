@@ -1,18 +1,41 @@
+// Page checks against a fresh build. Builds src/ into a scratch dir with tools/build.py, serves it
+// on a local port for the duration of the run, and exercises the page in Chromium, WebKit and
+// Firefox. Needs Playwright with the three browsers installed (global install is fine).
+//
+//     SKIP_LINKS=1 NODE_PATH=$(npm root -g) node tests/verify.js
+//
 const { chromium, webkit, firefox } = require('playwright');
 const path = require('path');
 const fs = require('fs');
+const os = require('os');
+const http = require('http');
+const { execFileSync } = require('child_process');
 
-const BASE = 'http://127.0.0.1:8765/';
+const ROOT = path.join(__dirname, '..');
 const OUT = path.join(__dirname, 'shots');
 fs.mkdirSync(OUT, { recursive: true });
+
+// Build into a scratch dir so the check never depends on a stale dist/.
+const SITE = fs.mkdtempSync(path.join(os.tmpdir(), 'donate-verify-'));
+console.log(execFileSync('python3', [path.join(ROOT, 'tools', 'build.py'), '--out', SITE], { encoding: 'utf8' }).trim());
+
+const MIME = { '.html': 'text/html; charset=utf-8', '.css': 'text/css', '.js': 'text/javascript', '.webp': 'image/webp', '.png': 'image/png', '.ico': 'image/x-icon' };
+const server = http.createServer((req, res) => {
+  let file = path.join(SITE, decodeURIComponent(new URL(req.url, 'http://x').pathname));
+  if (fs.existsSync(file) && fs.statSync(file).isDirectory()) file = path.join(file, 'index.html');
+  if (!file.startsWith(SITE) || !fs.existsSync(file)) { res.writeHead(404); return res.end(); }
+  res.writeHead(200, { 'content-type': MIME[path.extname(file)] || 'application/octet-stream' });
+  fs.createReadStream(file).pipe(res);
+});
+let BASE = '';
 
 const VIEWPORTS = [
   { name: 'mobile', width: 390, height: 844 },
   { name: 'tablet', width: 820, height: 1180 },
   { name: 'desktop', width: 1440, height: 900 },
 ];
-// Skins are discovered from skins/*.css so new ones are verified without touching this file.
-const SKINS = Object.fromEntries(fs.readdirSync(path.join(__dirname, '..', 'skins')).filter((f) => f.endsWith('.css')).map((f) => [f.replace(/\.css$/, ''), true]));
+// Skins are discovered from src/skins/*.css so new ones are verified without touching this file.
+const SKINS = Object.fromEntries(fs.readdirSync(path.join(ROOT, 'src', 'skins')).filter((f) => f.endsWith('.css')).map((f) => [f.replace(/\.css$/, ''), true]));
 console.log('skins under test:', Object.keys(SKINS).join(', '));
 
 const problems = [];
@@ -45,8 +68,9 @@ async function snap(engine, engineName, vp, colorScheme, locale, skin, tag) {
   if (info.scrollWidth > info.innerWidth) problems.push(`[${tag}] horizontal overflow: scrollWidth ${info.scrollWidth} > innerWidth ${info.innerWidth}`);
   if (info.skin !== skin) problems.push(`[${tag}] skin param ignored: data-skin=${info.skin}`);
   if (info.search !== '') problems.push(`[${tag}] skin param not stripped from URL: ${info.search}`);
+  // Skins are inlined by the build: the page must not request any skin stylesheet.
   const skinSheets = info.sheets.filter((h) => h.startsWith('skins/'));
-  if (skinSheets.length !== 1 || skinSheets[0] !== `skins/${skin}.css`) problems.push(`[${tag}] skin stylesheet wrong: ${JSON.stringify(info.sheets)}`);
+  if (skinSheets.length) problems.push(`[${tag}] skin stylesheet requested instead of inlined: ${JSON.stringify(info.sheets)}`);
   if (!info.sheets.some((h) => h.startsWith('https://fonts.googleapis.com/'))) problems.push(`[${tag}] font stylesheet missing: ${JSON.stringify(info.sheets)}`);
   if (!info.bgToken) problems.push(`[${tag}] --bg token undefined (skin css not applied)`);
   await page.screenshot({ path: path.join(OUT, `${tag}.png`), fullPage: true });
@@ -149,11 +173,10 @@ async function linkTest() {
 }
 
 async function paintTest() {
-  // The first paint must not wait for the skin stylesheet or for Google Fonts, and while the
-  // sheet is in flight the page must be a clean canvas in the skin's own background colour
-  // with transparent text (never white, never unstyled). Checked in all three engines with
-  // JS; without JS the noscript path just has to end up styled.
-  const DELAY = 1500;
+  // The page must paint complete, in its skin, as soon as the HTML has arrived: no skin stylesheet
+  // request at all, and a first paint that does not wait for Google Fonts (delayed here). Checked
+  // in all three engines with JS; without JS the default skin must be complete too.
+  const DELAY = 3000;
   for (const [engineName, engine] of [['chromium', chromium], ['webkit', webkit], ['firefox', firefox]]) {
     for (const js of [true, false]) {
       const tag = `paint:${engineName}:${js ? 'js' : 'nojs'}`;
@@ -161,42 +184,37 @@ async function paintTest() {
       const ctx = await browser.newContext({ colorScheme: 'dark', javaScriptEnabled: js });
       const page = await ctx.newPage();
       attach(page, tag);
-      await page.route('**/skins/*.css', async (route) => { await new Promise((r) => setTimeout(r, DELAY)); await route.continue(); });
-      await page.route('**/fonts.googleapis.com/**', async (route) => { await new Promise((r) => setTimeout(r, DELAY * 3)); await route.continue(); });
+      await page.route('**/fonts.googleapis.com/**', async (route) => { await new Promise((r) => setTimeout(r, DELAY)); await route.continue(); });
       await page.goto(`${BASE}?skin=${Object.keys(SKINS)[0]}`, { waitUntil: 'domcontentloaded' });
-      // In flight: sampled well before the sheet can have arrived.
-      const mid = js ? await page.evaluate(() => ({
-        loading: document.documentElement.hasAttribute('data-skin-loading'),
-        htmlBg: getComputedStyle(document.documentElement).backgroundColor,
-        inlineBg: document.documentElement.style.backgroundColor,
-        h1Color: getComputedStyle(document.querySelector('h1')).color,
-        buttonColor: getComputedStyle(document.querySelector('button')).color,
-        borderColor: getComputedStyle(document.querySelector('a')).borderTopColor,
-      })) : null;
+      // Sampled while the fonts stylesheet is still in flight: the page must already be complete.
+      const early = await page.evaluate(() => ({
+        skin: document.documentElement.getAttribute('data-skin'),
+        bg: getComputedStyle(document.body).backgroundColor,
+        bgToken: getComputedStyle(document.documentElement).getPropertyValue('--bg').trim(),
+        textColor: getComputedStyle(document.querySelector('p')).color,
+        h1Size: getComputedStyle(document.querySelector('h1')).fontSize,
+      }));
       await page.waitForLoadState('load');
       await page.waitForTimeout(300);
       const t = await page.evaluate(() => ({
         fcp: (performance.getEntriesByType('paint').find((e) => e.name === 'first-contentful-paint') || {}).startTime,
-        cssEnd: (performance.getEntriesByType('resource').find((e) => /skins\/[^/]+\.css/.test(e.name)) || {}).responseEnd,
-        loading: document.documentElement.hasAttribute('data-skin-loading'),
-        inlineBg: document.documentElement.style.backgroundColor,
+        fontsEnd: (performance.getEntriesByType('resource').find((e) => /fonts\.googleapis/.test(e.name)) || {}).responseEnd,
+        skinRequests: performance.getEntriesByType('resource').filter((e) => /skins\/[^/]+\.css/.test(e.name)).length,
         bg: getComputedStyle(document.body).backgroundColor,
-        // The lede, not the h1: a skin may legitimately set the h1 transparent for gradient text.
-        textColor: getComputedStyle(document.querySelector('p')).color,
+        h1Size: getComputedStyle(document.querySelector('h1')).fontSize,
         media: Array.from(document.querySelectorAll('link[rel=stylesheet]')).map((l) => `${l.getAttribute('href').replace(/\?.*/, '').slice(0, 24)}:${l.media || 'all'}`).join(' '),
       }));
+      if (!early.bgToken || early.bg === 'rgba(0, 0, 0, 0)') problems.push(`[${tag}] not styled on arrival: ${JSON.stringify(early)}`);
+      if (early.textColor === 'rgba(0, 0, 0, 0)') problems.push(`[${tag}] text invisible on arrival`);
+      if (early.bg !== t.bg || early.h1Size !== t.h1Size) problems.push(`[${tag}] page changed after the fonts arrived (layout shift): ${JSON.stringify({ early, t })}`);
+      if (t.skinRequests) problems.push(`[${tag}] ${t.skinRequests} skin stylesheet request(s); skins must be inlined`);
       if (js) {
-        if (!mid.loading || !mid.inlineBg) problems.push(`[${tag}] not in loading state while the sheet was in flight: ${JSON.stringify(mid)}`);
-        if (mid.htmlBg !== t.bg) problems.push(`[${tag}] in-flight canvas ${mid.htmlBg} differs from the skin background ${t.bg}`);
-        for (const k of ['h1Color', 'buttonColor', 'borderColor']) if (mid[k] !== 'rgba(0, 0, 0, 0)') problems.push(`[${tag}] in-flight ${k} visible: ${mid[k]}`);
-        if (!(t.fcp > 0) || !(t.cssEnd > 0)) problems.push(`[${tag}] missing timing: ${JSON.stringify(t)}`);
-        else if (t.fcp >= t.cssEnd) problems.push(`[${tag}] first paint waited for the skin stylesheet: ${JSON.stringify(t)}`);
-        if (!/skins\/[^ ]*:all/.test(t.media) || !/fonts\.googleapis[^ ]*:all/.test(t.media)) problems.push(`[${tag}] a stylesheet was not activated: ${t.media}`);
-      }
-      if (t.loading || t.inlineBg) problems.push(`[${tag}] loading state not cleared: ${JSON.stringify(t)}`);
-      if (t.bg === 'rgba(0, 0, 0, 0)') problems.push(`[${tag}] body has no background`);
-      if (t.textColor === 'rgba(0, 0, 0, 0)') problems.push(`[${tag}] text still transparent after load`);
-      console.log(`${tag}: fcp=${Math.round(t.fcp)} cssEnd=${Math.round(t.cssEnd)} bg=${t.bg}${mid ? ` inflight=${mid.htmlBg}/${mid.h1Color}` : ''} ${t.media}`);
+        if (!(t.fcp > 0) || !(t.fontsEnd > 0)) problems.push(`[${tag}] missing timing: ${JSON.stringify(t)}`);
+        else if (t.fcp >= t.fontsEnd) problems.push(`[${tag}] first paint waited for fonts: ${JSON.stringify(t)}`);
+        if (!/fonts\.googleapis[^ ]*:all/.test(t.media)) problems.push(`[${tag}] fonts stylesheet not activated: ${t.media}`);
+        if (early.skin !== Object.keys(SKINS)[0]) problems.push(`[${tag}] skin param ignored: ${early.skin}`);
+      } else if (early.skin !== 'nebula') problems.push(`[${tag}] no-JS default skin is ${early.skin}`);
+      console.log(`${tag}: fcp=${Math.round(t.fcp)} fontsEnd=${Math.round(t.fontsEnd)} bg=${t.bg} skinRequests=${t.skinRequests} ${t.media}`);
       await browser.close();
     }
   }
@@ -204,7 +222,7 @@ async function paintTest() {
 
 function identifierScan() {
   // Adblock hygiene: identifiers must not carry fundraising words; hrefs are exempt.
-  const html = fs.readFileSync(path.join(__dirname, '..', 'index.html'), 'utf8').replace(/href="[^"]*"/g, '');
+  const html = fs.readFileSync(path.join(ROOT, 'src', 'index.html'), 'utf8').replace(/href="[^"]*"/g, '');
   const re = /(class|id|data-[\w-]+|aria-label)="[^"]*(sponsor|donat|donor|supporter|patron|tip-?jar)[^"]*"/gi;
   const hits = html.match(re) || [];
   for (const h of hits) problems.push(`[identifiers] ${h}`);
@@ -212,6 +230,9 @@ function identifierScan() {
 }
 
 (async () => {
+  await new Promise((r) => server.listen(0, '127.0.0.1', r));
+  BASE = `http://127.0.0.1:${server.address().port}/`;
+  console.log('serving', SITE, 'at', BASE);
   for (const skin of Object.keys(SKINS)) {
     for (const vp of VIEWPORTS) {
       await snap(chromium, 'chromium', vp, 'light', 'zh-TW', skin, `${skin}-${vp.name}-zh-light`);
@@ -225,6 +246,8 @@ function identifierScan() {
   await paintTest();
   identifierScan();
   if (!process.env.SKIP_LINKS) await linkTest();
+  server.close();
+  fs.rmSync(SITE, { recursive: true, force: true });
   console.log('\nPROBLEMS:', problems.length ? '\n' + problems.join('\n') : 'none');
   process.exit(problems.length ? 1 : 0);
 })().catch((e) => { console.error(e); process.exit(2); });

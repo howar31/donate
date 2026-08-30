@@ -1,6 +1,6 @@
 /* Skin: nebula. Slate canvas, violet accent, glass cards, after howar31.com;
    Atkinson Hyperlegible Next + JetBrains Mono. Dark mirrors the site, light is its daylight counterpart.
-   The default skin: index.html ships with data-skin="nebula" and the <noscript> fallback loads this file.
+   The default skin: index.html ships with data-skin="nebula", which is what a visitor without JS sees.
 
    Token contract (every skin must define all of these):
      colors, three times (light / system dark / forced dark):

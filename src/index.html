@@ -18,19 +18,12 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <style>
     /* Shared shell: layout, structure, interaction states.
-       Every color, typeface, size and shape below is read from tokens that the
-       skin stylesheet (skins/<name>.css, attached by the head script for this
-       load) must define. See skins/nebula.css for the token contract.
+       Every color, typeface, size and shape below is read from tokens that
+       every skin (src/skins/<name>.css) must define; the build inlines all
+       skins into the next <style> and the head script picks one per load by
+       setting data-skin. See skins/nebula.css for the token contract.
        CJK text uses system fonts on purpose (a CJK webfont costs ~700 KB). */
     *, *::before, *::after { box-sizing: border-box; }
-    /* While the skin stylesheet is in flight the head script paints the
-       skin's background on <html> and sets data-skin-loading; text (and the
-       currentColor borders that have no token yet) stays transparent, so the
-       first paint is a clean canvas in the right colour, never white or
-       unstyled, whether or not the browser blocks rendering on the sheet.
-       Do not hide the body instead: WebKit does not paint a page it deems
-       visually empty, and would show white until the sheet lands. */
-    html[data-skin-loading] body, html[data-skin-loading] body * { color: transparent; }
     html { -webkit-text-size-adjust: 100%; }
     body {
       margin: 0;
@@ -202,14 +195,19 @@
       *, *::before, *::after { transition: none !important; animation: none !important; }
     }
   </style>
+  <style>
+    /* All skins, inlined here by tools/build.py from src/skins/*.css so the
+       page paints complete on arrival with no stylesheet request. Empty in
+       the source; never edit the generated copy. */
+    /* skins:begin */
+    /* skins:end */
+  </style>
   <script>
     // Runs before first paint: pick a skin for this load (never the one shown
-    // last time), apply the stored light/dark choice, paint the skin's
-    // background at once, then load its stylesheet and fonts without blocking
-    // rendering, and sync theme-color.
-    // To add a skin: create skins/<name>.css and add one entry here: fonts URL,
-    // light/dark = the skin's --bg (used for theme-color and painted before the
-    // stylesheet arrives); if theme-color must differ from --bg, add canvas.
+    // last time), apply the stored light/dark choice, load the skin's fonts
+    // without blocking rendering, and sync theme-color.
+    // To add a skin: create src/skins/<name>.css and add one entry here
+    // (fonts URL, light/dark theme-color); the build inlines the stylesheet.
     (function () {
       var root = document.documentElement;
       var SKINS = {
@@ -231,9 +229,7 @@
         poppy: {
           fonts: 'https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700&display=swap',
           light: '#c53d4a',
-          dark: '#9c3040',
-          // theme-color is the top band; the page behind it is what to paint first.
-          canvas: { light: '#faf6f4', dark: '#140f10' }
+          dark: '#9c3040'
         },
         saffron: {
           fonts: 'https://fonts.googleapis.com/css2?family=Archivo+Black&family=Archivo:wght@400;500&display=swap',
@@ -284,44 +280,15 @@
       root.setAttribute('data-skin', skin);
       try { localStorage.setItem('skin', skin); } catch (e) {}
 
-      var theme = null;
-      try { theme = localStorage.getItem('theme'); } catch (e) {}
-      if (theme === 'dark' || theme === 'light') root.setAttribute('data-theme', theme);
-      var isDark = theme === 'dark' || (theme !== 'light' && !!window.matchMedia &&
-        window.matchMedia('(prefers-color-scheme: dark)').matches);
+      try {
+        var theme = localStorage.getItem('theme');
+        if (theme === 'dark' || theme === 'light') root.setAttribute('data-theme', theme);
+      } catch (e) {}
 
-      // Paint the background now, from the same colours theme-color uses, and
-      // keep text transparent (shell style) until the skin stylesheet lands.
-      // The sheet is loaded as a print stylesheet and switched to all on
-      // arrival: WebKit blocks rendering on any pending head stylesheet, and
-      // the point is to paint before it arrives. Measured on production: the
-      // sheet takes 300 to 500 ms from the CDN, and a render-blocking wait
-      // shows as a white flash (a white unstyled page where the browser does
-      // not block at all).
-      var canvas = SKINS[skin].canvas || SKINS[skin];
-      root.style.backgroundColor = isDark ? canvas.dark : canvas.light;
-      root.style.colorScheme = isDark ? 'dark' : 'light';
-      root.setAttribute('data-skin-loading', '');
-      var revealed = false;
-      function reveal() {
-        if (revealed) return;
-        revealed = true;
-        root.removeAttribute('data-skin-loading');
-        root.style.backgroundColor = '';
-        root.style.colorScheme = '';
-      }
-      var sheet = document.createElement('link');
-      sheet.rel = 'stylesheet';
-      sheet.media = 'print';
-      sheet.onload = function () { this.media = 'all'; reveal(); };
-      sheet.onerror = reveal;
-      sheet.href = 'skins/' + skin + '.css';
-      document.head.appendChild(sheet);
-      // Safety net for a hung request: better unstyled text than none.
-      setTimeout(reveal, 4000);
-
-      // Fonts never block first paint either: if fonts.googleapis.com is slow
-      // or unreachable the page shows in system fonts (display=swap).
+      // Fonts never block first paint: loaded as a print stylesheet and
+      // switched to all once fetched (WebKit blocks rendering on any pending
+      // head stylesheet). If fonts.googleapis.com is slow or unreachable the
+      // page shows in system fonts (display=swap).
       var fonts = document.createElement('link');
       fonts.rel = 'stylesheet';
       fonts.media = 'print';
@@ -336,11 +303,6 @@
       }
     })();
   </script>
-  <noscript>
-    <!-- Without JS: the default skin in system fonts. No webfont request, so
-         nothing outside this origin can hold up the page. -->
-    <link rel="stylesheet" href="skins/nebula.css">
-  </noscript>
 </head>
 <body>
   <header class="topbar">

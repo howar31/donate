@@ -1,11 +1,10 @@
-"""Token-contract check for every skin in skins/*.css.
+"""Token-contract check for every skin in src/skins/*.css.
 
 Asserts, per skin: the 10 colour tokens in all three colour blocks (light, system dark,
 forced dark), the 14 type/shape tokens once, every skin-specific extra token defined in the
 light block also defined in both dark blocks, no !important, no adblock-bait identifiers.
-Also cross-checks index.html's SKINS map: every skin file has an entry and vice versa, and the
-colour painted before the stylesheet arrives (canvas, else light/dark) equals the skin's --bg
-in the light and forced-dark blocks, so the in-flight canvas never differs from the page.
+Also cross-checks src/index.html: every skin file has a SKINS entry and vice versa, and the
+skins region is empty (the build fills it; generated CSS must never be committed there).
 Static companion to tests/verify.js (which needs a browser); run from the repo root:
 
     python3 tests/tokens.py
@@ -17,7 +16,7 @@ import sys
 COLORS="--bg --surface --ink --muted --faint --line --line-hover --accent --region --shadow".split()
 ONCE="--font-body --font-display --font-label --font-size-body --font-size-lede --font-size-note --display-weight --display-tracking --name-weight --name-weight-latin --name-tracking --label-weight --label-tracking --radius-card".split()
 failed = False
-for f in sorted(glob.glob('skins/*.css')):
+for f in sorted(glob.glob('src/skins/*.css')):
     s=open(f).read(); name=f.split('/')[-1][:-4]
     # split into the three color blocks by selector
     blocks={}
@@ -42,25 +41,19 @@ for f in sorted(glob.glob('skins/*.css')):
     print(name, 'OK' if not probs else 'PROBLEMS: ' + '; '.join(probs))
     failed |= bool(probs)
 
-# SKINS map in index.html vs the skin files
-html=open('index.html').read()
+# src/index.html vs the skin files
+html=open('src/index.html').read()
 m=re.search(r'var SKINS = \{(.*?)\n      \};',html,re.S)
-entries=dict(re.findall(r'\n        ([a-z0-9-]+): \{(.*?)\n        \}',m.group(1),re.S)) if m else {}
-files=[f.split('/')[-1][:-4] for f in sorted(glob.glob('skins/*.css'))]
-for name in sorted(set(files)|set(entries)):
+entries=set(re.findall(r'\n        ([a-z0-9-]+): \{',m.group(1))) if m else set()
+files=[f.split('/')[-1][:-4] for f in sorted(glob.glob('src/skins/*.css'))]
+for name in sorted(set(files)|entries):
     probs=[]
-    if name not in entries: probs.append('no SKINS entry in index.html')
-    elif name not in files: probs.append('SKINS entry without skins/%s.css'%name)
-    else:
-        e=entries[name]; css=open('skins/%s.css'%name).read()
-        canvas=re.search(r'canvas:\s*\{([^}]*)\}',e)
-        src=canvas.group(1) if canvas else e
-        want={k:v.lower() for k,v in re.findall(r"(light|dark):\s*'(#[0-9a-fA-F]{3,8})'",src)}
-        for mode,pat in [('light',r':root\[data-skin="%s"\]\s*\{(.*?)\n\}'%name),
-                         ('dark',r':root\[data-skin="%s"\]\[data-theme="dark"\]\s*\{(.*?)\n\}'%name)]:
-            b=re.search(pat,css,re.S); bg=re.search(r'--bg:\s*([^;]+);',b.group(1)) if b else None
-            got=bg.group(1).strip().lower() if bg else None
-            if want.get(mode)!=got: probs.append(f'{mode} canvas {want.get(mode)} != --bg {got}')
+    if name not in entries: probs.append('no SKINS entry in src/index.html')
+    elif name not in files: probs.append('SKINS entry without src/skins/%s.css'%name)
     print('SKINS', name, 'OK' if not probs else 'PROBLEMS: ' + '; '.join(probs))
     failed |= bool(probs)
+region=re.search(r'/\* skins:begin \*/(.*?)/\* skins:end \*/',html,re.S)
+ok=bool(region) and not region.group(1).strip()
+print('skins region', 'OK (empty, filled by the build)' if ok else 'PROBLEMS: missing markers or generated content committed in src/index.html')
+failed |= not ok
 sys.exit(1 if failed else 0)

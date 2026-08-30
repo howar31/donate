@@ -1,6 +1,6 @@
 /* Skin: blush. Editorial rosé: cream-rose paper, italic serif headline and lede, sharp-cornered cards
    with a rose-tinted shadow, an outlined arrow ring that fills on hover; Instrument Serif + Instrument Sans.
-   Token contract: see skins/nebula.css. */
+   Token contract: see src/skins/nebula.css. */
 
 :root[data-skin="blush"] {
   --font-body: 'Instrument Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang TC', 'Microsoft JhengHei', 'Noto Sans TC', 'Noto Sans CJK TC', sans-serif;

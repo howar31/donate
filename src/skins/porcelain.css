@@ -1,6 +1,6 @@
 /* Skin: porcelain. Modern minimal: tonal neutral ground, white cards with large radii, soft
    layered shadows and an inset highlight, a circular arrow chip; Geist only.
-   Token contract: see skins/nebula.css. */
+   Token contract: see src/skins/nebula.css. */
 
 :root[data-skin="porcelain"] {
   --font-body: 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang TC', 'Microsoft JhengHei', 'Noto Sans TC', 'Noto Sans CJK TC', sans-serif;

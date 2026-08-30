@@ -1,6 +1,6 @@
 /* Skin: poppy. Brick banner: a brick-red field across the top of the page (a tiled brick texture
    under a translucent tint) that the white cards hang over, red-tinted shadows, a red arrow disc;
-   Manrope. Token contract: see skins/nebula.css. */
+   Manrope. Token contract: see src/skins/nebula.css. */
 
 :root[data-skin="poppy"] {
   --font-body: 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang TC', 'Microsoft JhengHei', 'Noto Sans TC', 'Noto Sans CJK TC', sans-serif;

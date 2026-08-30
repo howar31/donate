@@ -1,5 +1,5 @@
 /* Skin: tuscan. Parchment walls, terracotta accent, olive labels; Cinzel + EB Garamond.
-   Token contract: see skins/nebula.css. */
+   Token contract: see src/skins/nebula.css. */
 
 :root[data-skin="tuscan"] {
   --font-body: 'EB Garamond', 'PingFang TC', 'Microsoft JhengHei', 'Noto Sans TC', 'Noto Sans CJK TC', Georgia, serif;

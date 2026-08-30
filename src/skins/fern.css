@@ -1,6 +1,6 @@
 /* Skin: fern. Botanical bookplate on sage linen: woven grain ground, paper cards framed by a
    double rule, ornament kickers; Fraunces (display) + Figtree.
-   Token contract: see skins/nebula.css. */
+   Token contract: see src/skins/nebula.css. */
 
 :root[data-skin="fern"] {
   --font-body: 'Figtree', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang TC', 'Microsoft JhengHei', 'Noto Sans TC', 'Noto Sans CJK TC', sans-serif;

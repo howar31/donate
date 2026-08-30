@@ -1,32 +1,16 @@
-// Page checks against a fresh build. Builds src/ into a scratch dir with tools/build.py, serves it
-// on a local port for the duration of the run, and exercises the page in Chromium, WebKit and
-// Firefox. Needs Playwright with the three browsers installed (global install is fine).
+// Full page checks against a fresh build (see tests/site.js): screenshots per skin, interactions,
+// the random picker, paint timing, in Chromium, WebKit and Firefox. Needs Playwright with the three
+// browsers installed (global install is fine). The quick CI subset lives in tests/smoke.js.
 //
 //     SKIP_LINKS=1 NODE_PATH=$(npm root -g) node tests/verify.js
 //
 const { chromium, webkit, firefox } = require('playwright');
 const path = require('path');
 const fs = require('fs');
-const os = require('os');
-const http = require('http');
-const { execFileSync } = require('child_process');
+const { ROOT, skinNames, startSite } = require('./site');
 
-const ROOT = path.join(__dirname, '..');
 const OUT = path.join(__dirname, 'shots');
 fs.mkdirSync(OUT, { recursive: true });
-
-// Build into a scratch dir so the check never depends on a stale dist/.
-const SITE = fs.mkdtempSync(path.join(os.tmpdir(), 'donate-verify-'));
-console.log(execFileSync('python3', [path.join(ROOT, 'tools', 'build.py'), '--out', SITE], { encoding: 'utf8' }).trim());
-
-const MIME = { '.html': 'text/html; charset=utf-8', '.css': 'text/css', '.js': 'text/javascript', '.webp': 'image/webp', '.png': 'image/png', '.ico': 'image/x-icon' };
-const server = http.createServer((req, res) => {
-  let file = path.join(SITE, decodeURIComponent(new URL(req.url, 'http://x').pathname));
-  if (fs.existsSync(file) && fs.statSync(file).isDirectory()) file = path.join(file, 'index.html');
-  if (!file.startsWith(SITE) || !fs.existsSync(file)) { res.writeHead(404); return res.end(); }
-  res.writeHead(200, { 'content-type': MIME[path.extname(file)] || 'application/octet-stream' });
-  fs.createReadStream(file).pipe(res);
-});
 let BASE = '';
 
 const VIEWPORTS = [
@@ -34,8 +18,7 @@ const VIEWPORTS = [
   { name: 'tablet', width: 820, height: 1180 },
   { name: 'desktop', width: 1440, height: 900 },
 ];
-// Skins are discovered from src/skins/*.css so new ones are verified without touching this file.
-const SKINS = Object.fromEntries(fs.readdirSync(path.join(ROOT, 'src', 'skins')).filter((f) => f.endsWith('.css')).map((f) => [f.replace(/\.css$/, ''), true]));
+const SKINS = Object.fromEntries(skinNames().map((n) => [n, true]));
 console.log('skins under test:', Object.keys(SKINS).join(', '));
 
 const problems = [];
@@ -206,7 +189,7 @@ async function paintTest() {
       }));
       if (!early.bgToken || early.bg === 'rgba(0, 0, 0, 0)') problems.push(`[${tag}] not styled on arrival: ${JSON.stringify(early)}`);
       if (early.textColor === 'rgba(0, 0, 0, 0)') problems.push(`[${tag}] text invisible on arrival`);
-      if (early.bg !== t.bg || early.h1Size !== t.h1Size) problems.push(`[${tag}] page changed after the fonts arrived (layout shift): ${JSON.stringify({ early, t })}`);
+      if (early.bg !== t.bg || early.h1Size !== t.h1Size) problems.push(`[${tag}] styled state changed after the fonts arrived: ${JSON.stringify({ early, t })}`);
       if (t.skinRequests) problems.push(`[${tag}] ${t.skinRequests} skin stylesheet request(s); skins must be inlined`);
       if (js) {
         if (!(t.fcp > 0) || !(t.fontsEnd > 0)) problems.push(`[${tag}] missing timing: ${JSON.stringify(t)}`);
@@ -230,9 +213,8 @@ function identifierScan() {
 }
 
 (async () => {
-  await new Promise((r) => server.listen(0, '127.0.0.1', r));
-  BASE = `http://127.0.0.1:${server.address().port}/`;
-  console.log('serving', SITE, 'at', BASE);
+  const site = await startSite('donate-verify');
+  BASE = site.base;
   for (const skin of Object.keys(SKINS)) {
     for (const vp of VIEWPORTS) {
       await snap(chromium, 'chromium', vp, 'light', 'zh-TW', skin, `${skin}-${vp.name}-zh-light`);
@@ -246,8 +228,7 @@ function identifierScan() {
   await paintTest();
   identifierScan();
   if (!process.env.SKIP_LINKS) await linkTest();
-  server.close();
-  fs.rmSync(SITE, { recursive: true, force: true });
+  site.close();
   console.log('\nPROBLEMS:', problems.length ? '\n' + problems.join('\n') : 'none');
   process.exit(problems.length ? 1 : 0);
 })().catch((e) => { console.error(e); process.exit(2); });

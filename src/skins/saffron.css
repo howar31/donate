@@ -1,7 +1,7 @@
 /* Skin: saffron. Poster print: solid golden ground, near-black ink, 2px strokes, hard offset
    shadows, left-aligned hero hung from a thick rule; dark is warm graphite with the same strokes in
    mustard gold. Archivo Black + Archivo.
-   Token contract: see skins/nebula.css. */
+   Token contract: see src/skins/nebula.css. */
 
 :root[data-skin="saffron"] {
   --font-body: 'Archivo', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang TC', 'Microsoft JhengHei', 'Noto Sans TC', 'Noto Sans CJK TC', sans-serif;

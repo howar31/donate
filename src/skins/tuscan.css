@@ -1,4 +1,5 @@
-/* Skin: tuscan. Parchment walls, terracotta accent, olive labels; Cinzel + EB Garamond.
+/* Skin: tuscan. Lime-washed plaster walls in drifting afternoon sun, a cypress horizon at the
+   foot, terracotta accent, olive labels; Cinzel + EB Garamond.
    Token contract: see src/skins/nebula.css. */
 
 :root[data-skin="tuscan"] {
@@ -29,6 +30,11 @@
   --accent: #b4532c;
   --region: #6c6d3b;
   --shadow: none;
+  --grain: 0.34;
+  --grain-blend: multiply;
+  --sun: rgba(255, 246, 220, 0.6);
+  --horizon: rgba(122, 90, 58, 0.16);
+  --cloud: rgba(92, 64, 36, 0.42);
 }
 @media (prefers-color-scheme: dark) {
   :root[data-skin="tuscan"]:not([data-theme="light"]) {
@@ -44,6 +50,11 @@
     --accent: #d9834f;
     --region: #b1b371;
     --shadow: none;
+    --grain: 0.15;
+    --grain-blend: soft-light;
+    --sun: rgba(255, 196, 132, 0.13);
+    --horizon: rgba(217, 160, 106, 0.14);
+    --cloud: rgba(43, 29, 19, 0.6);
   }
 }
 :root[data-skin="tuscan"][data-theme="dark"] {
@@ -59,9 +70,91 @@
   --accent: #d9834f;
   --region: #b1b371;
   --shadow: none;
+  --grain: 0.15;
+  --grain-blend: soft-light;
+  --sun: rgba(255, 196, 132, 0.13);
+  --horizon: rgba(217, 160, 106, 0.14);
+  --cloud: rgba(43, 29, 19, 0.6);
 }
 
 /* A warm glow at the top of the page. */
 [data-skin="tuscan"] body {
   background: radial-gradient(1100px 520px at 50% -8%, var(--glow), transparent 70%) no-repeat, var(--bg);
+}
+[data-skin="tuscan"] .topbar,
+[data-skin="tuscan"] main,
+[data-skin="tuscan"] footer { position: relative; z-index: 1; }
+
+/* Plaster: broad mottling under a fine grain, both fractal noise, laid over the wall. */
+[data-skin="tuscan"] body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: var(--grain);
+  mix-blend-mode: var(--grain-blend);
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='420' height='420'%3E%3Cfilter id='m'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.018' numOctaves='4' seed='7' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.5 0 0 0 0 0.5 0 0 0 0 0.5 0 0 0 0.34 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23m)'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.5 0 0 0 0 0.5 0 0 0 0 0.5 0 0 0 0.26 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
+  background-size: 420px 420px, 220px 220px;
+}
+
+/* Afternoon sun: two feathered pools of light, overlapping on a tilt like sun through a
+   window softened by the room, drifting across the wall and back every 47 seconds while the
+   sun comes and goes behind clouds;
+   screen-blended so it brightens the plaster rather than paints it. */
+[data-skin="tuscan"] body::after {
+  content: '';
+  position: fixed;
+  top: -20vh;
+  left: -30vw;
+  width: 160vw;
+  height: 140vh;
+  z-index: 0;
+  pointer-events: none;
+  mix-blend-mode: screen;
+  background:
+    radial-gradient(closest-side, var(--sun) 0%, transparent 100%) 30% 22% / 58vw 44vh no-repeat,
+    radial-gradient(closest-side, var(--sun) 0%, transparent 100%) 46% 40% / 44vw 32vh no-repeat;
+  animation: tuscan-sun 47s ease-in-out infinite alternate;
+}
+@keyframes tuscan-sun {
+  from { transform: rotate(-16deg) translate(4vw, -2vh); opacity: 0.45; }
+  to { transform: rotate(-16deg) translate(-16vw, 4vh); opacity: 1; }
+}
+
+/* Horizon: rolling hills and cypresses (tools/tuscan-horizon.py) along the foot of the
+   viewport, under the plaster; a cloud shadow crosses the hills every 67 seconds. */
+[data-skin="tuscan"]::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    linear-gradient(90deg, transparent 0 36%, var(--cloud) 44% 52%, transparent 60% 100%) 0 0 / 300% 100% no-repeat,
+    var(--horizon);
+  animation: tuscan-cloud 67s linear infinite;
+  --horizon-mask: url('tuscan-horizon.svg');
+  -webkit-mask-image: var(--horizon-mask);
+  mask-image: var(--horizon-mask);
+  -webkit-mask-repeat: repeat-x;
+  mask-repeat: repeat-x;
+  -webkit-mask-position: 0 100%;
+  mask-position: 0 100%;
+  -webkit-mask-size: auto clamp(150px, 22vh, 220px);
+  mask-size: auto clamp(150px, 22vh, 220px);
+}
+
+@keyframes tuscan-cloud {
+  from { background-position: 100% 0; }
+  to { background-position: 0 0; }
+}
+
+@media (max-width: 640px) {
+  [data-skin="tuscan"]::after {
+    -webkit-mask-size: auto 140px;
+    mask-size: auto 140px;
+  }
 }

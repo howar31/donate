@@ -1,4 +1,4 @@
-const { chromium, webkit } = require('playwright');
+const { chromium, webkit, firefox } = require('playwright');
 const path = require('path');
 const fs = require('fs');
 
@@ -148,6 +148,41 @@ async function linkTest() {
   await browser.close();
 }
 
+async function paintTest() {
+  // First paint must wait for the skin stylesheet (else the page flashes white) but must not
+  // wait for Google Fonts (else an unreachable fonts host blanks the page). Checked with and
+  // without JS in all three engines; Firefox is the one that ignores link[blocking].
+  const DELAY = 1500;
+  for (const [engineName, engine] of [['chromium', chromium], ['webkit', webkit], ['firefox', firefox]]) {
+    for (const js of [true, false]) {
+      const tag = `paint:${engineName}:${js ? 'js' : 'nojs'}`;
+      const browser = await engine.launch();
+      const ctx = await browser.newContext({ colorScheme: 'dark', javaScriptEnabled: js });
+      const page = await ctx.newPage();
+      attach(page, tag);
+      await page.route('**/skins/*.css', async (route) => { await new Promise((r) => setTimeout(r, DELAY)); await route.continue(); });
+      // Fonts arrive much later than the skin: a paint that waited for them lands past cssEnd + DELAY.
+      await page.route('**/fonts.googleapis.com/**', async (route) => { await new Promise((r) => setTimeout(r, DELAY * 3)); await route.continue(); });
+      await page.goto(`${BASE}?skin=${Object.keys(SKINS)[0]}`, { waitUntil: 'load' });
+      await page.waitForTimeout(300);
+      const t = await page.evaluate(() => ({
+        fcp: (performance.getEntriesByType('paint').find((e) => e.name === 'first-contentful-paint') || {}).startTime,
+        cssEnd: (performance.getEntriesByType('resource').find((e) => /skins\/[^/]+\.css/.test(e.name)) || {}).responseEnd,
+        bg: getComputedStyle(document.body).backgroundColor,
+        fontsMedia: Array.from(document.querySelectorAll('link[rel=stylesheet]')).filter((l) => /fonts\.googleapis/.test(l.href)).map((l) => l.media).join(','),
+      }));
+      if (!(t.fcp > 0) || !(t.cssEnd > 0)) problems.push(`[${tag}] missing timing: ${JSON.stringify(t)}`);
+      else if (t.fcp < t.cssEnd) problems.push(`[${tag}] painted before skin css arrived (flash): ${JSON.stringify(t)}`);
+      else if (t.fcp > t.cssEnd + DELAY) problems.push(`[${tag}] first paint waited for fonts: ${JSON.stringify(t)}`);
+      if (t.bg === 'rgba(0, 0, 0, 0)') problems.push(`[${tag}] body has no background`);
+      // With JS the fonts sheet must have been switched from print to all once it arrived.
+      if (js && t.fontsMedia !== 'all') problems.push(`[${tag}] fonts stylesheet not activated: media=${JSON.stringify(t.fontsMedia)}`);
+      console.log(`${tag}: fcp=${Math.round(t.fcp)} cssEnd=${Math.round(t.cssEnd)} bg=${t.bg} fontsMedia=${t.fontsMedia}`);
+      await browser.close();
+    }
+  }
+}
+
 function identifierScan() {
   // Adblock hygiene: identifiers must not carry fundraising words; hrefs are exempt.
   const html = fs.readFileSync(path.join(__dirname, '..', 'index.html'), 'utf8').replace(/href="[^"]*"/g, '');
@@ -168,6 +203,7 @@ function identifierScan() {
     await interactionTest(skin);
   }
   await randomSkinTest();
+  await paintTest();
   identifierScan();
   if (!process.env.SKIP_LINKS) await linkTest();
   console.log('\nPROBLEMS:', problems.length ? '\n' + problems.join('\n') : 'none');

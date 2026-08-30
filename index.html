@@ -196,8 +196,8 @@
   </style>
   <script>
     // Runs before first paint: pick a skin for this load (never the one shown
-    // last time), attach its stylesheet and fonts, sync theme-color, then apply
-    // the stored light/dark choice.
+    // last time), load its stylesheet (render-blocking) and fonts (not
+    // blocking), sync theme-color, then apply the stored light/dark choice.
     // To add a skin: create skins/<name>.css and add one entry here.
     (function () {
       var root = document.documentElement;
@@ -271,15 +271,22 @@
       root.setAttribute('data-skin', skin);
       try { localStorage.setItem('skin', skin); } catch (e) {}
 
-      function attach(href) {
-        var link = document.createElement('link');
-        link.rel = 'stylesheet';
-        link.href = href;
-        link.setAttribute('blocking', 'render');
-        document.head.appendChild(link);
-      }
-      attach('skins/' + skin + '.css');
-      attach(SKINS[skin].fonts);
+      // Written into the parser stream, not appended: a parser-inserted
+      // stylesheet blocks rendering in every browser, whereas an appended
+      // <link> only blocks where the `blocking` attribute is supported (not
+      // Firefox, not Safari before 18.2) and the page would paint white first.
+      // `skin` is a key of SKINS by now, so nothing user-controlled is written.
+      document.write('<link rel="stylesheet" href="skins/' + skin + '.css">');
+      // Fonts never block first paint: if fonts.googleapis.com is slow or
+      // unreachable the page shows in system fonts (display=swap). Loaded as
+      // a print stylesheet and switched to all once fetched, because WebKit
+      // blocks rendering on any pending head stylesheet whatever its origin.
+      var fonts = document.createElement('link');
+      fonts.rel = 'stylesheet';
+      fonts.media = 'print';
+      fonts.onload = function () { this.media = 'all'; };
+      fonts.href = SKINS[skin].fonts;
+      document.head.appendChild(fonts);
 
       var metas = document.querySelectorAll('meta[name="theme-color"]');
       for (var i = 0; i < metas.length; i++) {
@@ -294,8 +301,9 @@
     })();
   </script>
   <noscript>
+    <!-- Without JS: the default skin in system fonts. No webfont request, so
+         nothing outside this origin can hold up the page. -->
     <link rel="stylesheet" href="skins/nebula.css">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:wght@400;500;700&family=JetBrains+Mono:wght@400&display=swap">
   </noscript>
 </head>
 <body>

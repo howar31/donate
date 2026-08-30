@@ -1,5 +1,7 @@
 /* Skin: blush. Editorial rosé: cream-rose paper, italic serif headline and lede, sharp-cornered cards
-   with a rose-tinted shadow, an outlined arrow ring that fills on hover; Instrument Serif + Instrument Sans.
+   with a rose-tinted shadow, an outlined arrow ring that fills on hover, a cherry branch in
+   bloom reaching in from the top-right corner and loose petals drifting down; dark is the
+   same branch lit up at night. Instrument Serif + Instrument Sans.
    Token contract: see src/skins/nebula.css. */
 
 :root[data-skin="blush"] {
@@ -32,11 +34,15 @@
   --surface-hover: #ffeef3;
   --shadow-hover: 0 2px 4px rgba(216, 35, 95, 0.06), 0 18px 40px rgba(216, 35, 95, 0.16);
   --bloom: rgba(224, 50, 110, 0.10);
+  --wood: rgba(120, 60, 80, 0.22);
+  --blossom: rgba(216, 35, 95, 0.14);
+  --petal: rgba(216, 35, 95, 0.2);
+  --lantern: transparent;
 }
 @media (prefers-color-scheme: dark) {
   :root[data-skin="blush"]:not([data-theme="light"]) {
     color-scheme: dark;
-    --bg: #1a0f14;
+    --bg: #171018;
     --surface: #24151b;
     --ink: #fbe9ef;
     --muted: #d7a9b8;
@@ -49,11 +55,15 @@
     --surface-hover: #2c1a21;
     --shadow-hover: 0 2px 4px rgba(0, 0, 0, 0.4), 0 18px 40px rgba(255, 122, 168, 0.12);
     --bloom: rgba(255, 122, 168, 0.08);
+    --wood: rgba(0, 0, 0, 0.45);
+    --blossom: rgba(255, 190, 210, 0.2);
+    --petal: rgba(255, 190, 210, 0.28);
+    --lantern: rgba(255, 160, 120, 0.14);
   }
 }
 :root[data-skin="blush"][data-theme="dark"] {
   color-scheme: dark;
-  --bg: #1a0f14;
+  --bg: #171018;
   --surface: #24151b;
   --ink: #fbe9ef;
   --muted: #d7a9b8;
@@ -66,6 +76,10 @@
   --surface-hover: #2c1a21;
   --shadow-hover: 0 2px 4px rgba(0, 0, 0, 0.4), 0 18px 40px rgba(255, 122, 168, 0.12);
   --bloom: rgba(255, 122, 168, 0.08);
+  --wood: rgba(0, 0, 0, 0.45);
+  --blossom: rgba(255, 190, 210, 0.2);
+  --petal: rgba(255, 190, 210, 0.28);
+  --lantern: rgba(255, 160, 120, 0.14);
 }
 
 /* Ground: a soft rose bloom at the top of the page. */
@@ -126,7 +140,85 @@
   color: var(--surface);
 }
 
+/* Cherry branch (tools/blush-sakura.py): the wood and the flowers are two masks drawn from the
+   same coordinates, so each takes its own colour; both hang from the top-right corner behind
+   the content. --sakura-h is the height of the square tile. */
+[data-skin="blush"] { --sakura-h: min(56vh, 560px); }
+[data-skin="blush"] .topbar,
+[data-skin="blush"] main,
+[data-skin="blush"] footer { position: relative; z-index: 1; }
+[data-skin="blush"]::before,
+[data-skin="blush"]::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-size: auto var(--sakura-h);
+  mask-size: auto var(--sakura-h);
+  -webkit-mask-position: calc(100% + 12px) -12px;
+  mask-position: calc(100% + 12px) -12px;
+}
+[data-skin="blush"]::before {
+  background-color: var(--wood);
+  --branch-mask: url('blush-branch.svg');
+  -webkit-mask-image: var(--branch-mask);
+  mask-image: var(--branch-mask);
+}
+[data-skin="blush"]::after {
+  background-color: var(--blossom);
+  --bloom-mask: url('blush-bloom.svg');
+  -webkit-mask-image: var(--bloom-mask);
+  mask-image: var(--bloom-mask);
+}
+
+/* Petal fall: a seamless tile of loose petals repeated over a sheet one tile taller than the
+   viewport, which slides down by exactly one tile per cycle (so the loop never jumps) while
+   swaying a little sideways. Transform only, so it costs nothing to run. */
+[data-skin="blush"] body::before {
+  content: '';
+  position: fixed;
+  top: -1000px;
+  right: -4vw;
+  bottom: 0;
+  left: -4vw;
+  z-index: -1;
+  pointer-events: none;
+  background-color: var(--petal);
+  --petal-mask: url('blush-petals.svg');
+  -webkit-mask-image: var(--petal-mask);
+  mask-image: var(--petal-mask);
+  -webkit-mask-size: 800px 1000px;
+  mask-size: 800px 1000px;
+  animation: blush-fall 45s linear infinite;
+}
+@keyframes blush-fall {
+  0% { transform: translate(0, 0); }
+  25% { transform: translate(-2vw, 250px); }
+  50% { transform: translate(0, 500px); }
+  75% { transform: translate(2vw, 750px); }
+  100% { transform: translate(0, 1000px); }
+}
+
+/* Night: a lantern's warm light from below the branch; transparent in the light theme. */
+[data-skin="blush"] body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: radial-gradient(60vw 55vh at 85% 100%, var(--lantern), transparent 70%);
+}
+
 @media (max-width: 640px) {
   [data-skin="blush"] .channel { padding: 20px 20px 20px 22px; }
   [data-skin="blush"] h1 { font-size: clamp(2.125rem, 9vw, 2.5rem); }
+  [data-skin="blush"] { --sakura-h: 42vh; }
+  [data-skin="blush"]::before,
+  [data-skin="blush"]::after {
+    -webkit-mask-position: calc(100% + 56px) -36px;
+    mask-position: calc(100% + 56px) -36px;
+  }
 }

@@ -23,6 +23,14 @@
        load) must define. See skins/nebula.css for the token contract.
        CJK text uses system fonts on purpose (a CJK webfont costs ~700 KB). */
     *, *::before, *::after { box-sizing: border-box; }
+    /* While the skin stylesheet is in flight the head script paints the
+       skin's background on <html> and sets data-skin-loading; text (and the
+       currentColor borders that have no token yet) stays transparent, so the
+       first paint is a clean canvas in the right colour, never white or
+       unstyled, whether or not the browser blocks rendering on the sheet.
+       Do not hide the body instead: WebKit does not paint a page it deems
+       visually empty, and would show white until the sheet lands. */
+    html[data-skin-loading] body, html[data-skin-loading] body * { color: transparent; }
     html { -webkit-text-size-adjust: 100%; }
     body {
       margin: 0;
@@ -196,9 +204,12 @@
   </style>
   <script>
     // Runs before first paint: pick a skin for this load (never the one shown
-    // last time), load its stylesheet (render-blocking) and fonts (not
-    // blocking), sync theme-color, then apply the stored light/dark choice.
-    // To add a skin: create skins/<name>.css and add one entry here.
+    // last time), apply the stored light/dark choice, paint the skin's
+    // background at once, then load its stylesheet and fonts without blocking
+    // rendering, and sync theme-color.
+    // To add a skin: create skins/<name>.css and add one entry here: fonts URL,
+    // light/dark = the skin's --bg (used for theme-color and painted before the
+    // stylesheet arrives); if theme-color must differ from --bg, add canvas.
     (function () {
       var root = document.documentElement;
       var SKINS = {
@@ -220,7 +231,9 @@
         poppy: {
           fonts: 'https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700&display=swap',
           light: '#c53d4a',
-          dark: '#9c3040'
+          dark: '#9c3040',
+          // theme-color is the top band; the page behind it is what to paint first.
+          canvas: { light: '#faf6f4', dark: '#140f10' }
         },
         saffron: {
           fonts: 'https://fonts.googleapis.com/css2?family=Archivo+Black&family=Archivo:wght@400;500&display=swap',
@@ -271,16 +284,44 @@
       root.setAttribute('data-skin', skin);
       try { localStorage.setItem('skin', skin); } catch (e) {}
 
-      // Written into the parser stream, not appended: a parser-inserted
-      // stylesheet blocks rendering in every browser, whereas an appended
-      // <link> only blocks where the `blocking` attribute is supported (not
-      // Firefox, not Safari before 18.2) and the page would paint white first.
-      // `skin` is a key of SKINS by now, so nothing user-controlled is written.
-      document.write('<link rel="stylesheet" href="skins/' + skin + '.css">');
-      // Fonts never block first paint: if fonts.googleapis.com is slow or
-      // unreachable the page shows in system fonts (display=swap). Loaded as
-      // a print stylesheet and switched to all once fetched, because WebKit
-      // blocks rendering on any pending head stylesheet whatever its origin.
+      var theme = null;
+      try { theme = localStorage.getItem('theme'); } catch (e) {}
+      if (theme === 'dark' || theme === 'light') root.setAttribute('data-theme', theme);
+      var isDark = theme === 'dark' || (theme !== 'light' && !!window.matchMedia &&
+        window.matchMedia('(prefers-color-scheme: dark)').matches);
+
+      // Paint the background now, from the same colours theme-color uses, and
+      // keep text transparent (shell style) until the skin stylesheet lands.
+      // The sheet is loaded as a print stylesheet and switched to all on
+      // arrival: WebKit blocks rendering on any pending head stylesheet, and
+      // the point is to paint before it arrives. Measured on production: the
+      // sheet takes 300 to 500 ms from the CDN, and a render-blocking wait
+      // shows as a white flash (a white unstyled page where the browser does
+      // not block at all).
+      var canvas = SKINS[skin].canvas || SKINS[skin];
+      root.style.backgroundColor = isDark ? canvas.dark : canvas.light;
+      root.style.colorScheme = isDark ? 'dark' : 'light';
+      root.setAttribute('data-skin-loading', '');
+      var revealed = false;
+      function reveal() {
+        if (revealed) return;
+        revealed = true;
+        root.removeAttribute('data-skin-loading');
+        root.style.backgroundColor = '';
+        root.style.colorScheme = '';
+      }
+      var sheet = document.createElement('link');
+      sheet.rel = 'stylesheet';
+      sheet.media = 'print';
+      sheet.onload = function () { this.media = 'all'; reveal(); };
+      sheet.onerror = reveal;
+      sheet.href = 'skins/' + skin + '.css';
+      document.head.appendChild(sheet);
+      // Safety net for a hung request: better unstyled text than none.
+      setTimeout(reveal, 4000);
+
+      // Fonts never block first paint either: if fonts.googleapis.com is slow
+      // or unreachable the page shows in system fonts (display=swap).
       var fonts = document.createElement('link');
       fonts.rel = 'stylesheet';
       fonts.media = 'print';
@@ -293,11 +334,6 @@
         var dark = /dark/.test(metas[i].getAttribute('media') || '');
         metas[i].setAttribute('content', dark ? SKINS[skin].dark : SKINS[skin].light);
       }
-
-      try {
-        var t = localStorage.getItem('theme');
-        if (t === 'dark' || t === 'light') root.setAttribute('data-theme', t);
-      } catch (e) {}
     })();
   </script>
   <noscript>

@@ -3,6 +3,9 @@
 Asserts, per skin: the 10 colour tokens in all three colour blocks (light, system dark,
 forced dark), the 14 type/shape tokens once, every skin-specific extra token defined in the
 light block also defined in both dark blocks, no !important, no adblock-bait identifiers.
+Also cross-checks index.html's SKINS map: every skin file has an entry and vice versa, and the
+colour painted before the stylesheet arrives (canvas, else light/dark) equals the skin's --bg
+in the light and forced-dark blocks, so the in-flight canvas never differs from the page.
 Static companion to tests/verify.js (which needs a browser); run from the repo root:
 
     python3 tests/tokens.py
@@ -37,5 +40,27 @@ for f in sorted(glob.glob('skins/*.css')):
     if '!important' in s: probs.append('!important used')
     if re.search(r'(sponsor|donat|donor|supporter|patron|tip-jar)',s,re.I): probs.append('adblock identifier')
     print(name, 'OK' if not probs else 'PROBLEMS: ' + '; '.join(probs))
+    failed |= bool(probs)
+
+# SKINS map in index.html vs the skin files
+html=open('index.html').read()
+m=re.search(r'var SKINS = \{(.*?)\n      \};',html,re.S)
+entries=dict(re.findall(r'\n        ([a-z0-9-]+): \{(.*?)\n        \}',m.group(1),re.S)) if m else {}
+files=[f.split('/')[-1][:-4] for f in sorted(glob.glob('skins/*.css'))]
+for name in sorted(set(files)|set(entries)):
+    probs=[]
+    if name not in entries: probs.append('no SKINS entry in index.html')
+    elif name not in files: probs.append('SKINS entry without skins/%s.css'%name)
+    else:
+        e=entries[name]; css=open('skins/%s.css'%name).read()
+        canvas=re.search(r'canvas:\s*\{([^}]*)\}',e)
+        src=canvas.group(1) if canvas else e
+        want={k:v.lower() for k,v in re.findall(r"(light|dark):\s*'(#[0-9a-fA-F]{3,8})'",src)}
+        for mode,pat in [('light',r':root\[data-skin="%s"\]\s*\{(.*?)\n\}'%name),
+                         ('dark',r':root\[data-skin="%s"\]\[data-theme="dark"\]\s*\{(.*?)\n\}'%name)]:
+            b=re.search(pat,css,re.S); bg=re.search(r'--bg:\s*([^;]+);',b.group(1)) if b else None
+            got=bg.group(1).strip().lower() if bg else None
+            if want.get(mode)!=got: probs.append(f'{mode} canvas {want.get(mode)} != --bg {got}')
+    print('SKINS', name, 'OK' if not probs else 'PROBLEMS: ' + '; '.join(probs))
     failed |= bool(probs)
 sys.exit(1 if failed else 0)

@@ -34,6 +34,7 @@
   --grain: 0.5;
   --grain-blend: multiply;
   --control-shadow: 0 1px 2px rgba(27, 46, 34, 0.05);
+  --frond: rgba(47, 111, 63, 0.17);
 }
 @media (prefers-color-scheme: dark) {
   :root[data-skin="fern"]:not([data-theme="light"]) {
@@ -53,6 +54,7 @@
     --grain: 0.28;
     --grain-blend: soft-light;
     --control-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+    --frond: rgba(143, 207, 154, 0.13);
   }
 }
 :root[data-skin="fern"][data-theme="dark"] {
@@ -72,6 +74,7 @@
   --grain: 0.28;
   --grain-blend: soft-light;
   --control-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+  --frond: rgba(143, 207, 154, 0.13);
 }
 
 /* Linen: a fixed sheet of monochrome fractal noise laid over the ground. */
@@ -89,6 +92,35 @@
 [data-skin="fern"] .topbar,
 [data-skin="fern"] main,
 [data-skin="fern"] footer { position: relative; z-index: 1; }
+
+/* Pressed fronds: one silhouette (tools/fern-frond.py) masked in the skin's ink, rising from
+   the bottom-left corner and, turned around, hanging from the top-right; both lie under the
+   linen so the grain runs over them. */
+[data-skin="fern"] body::after,
+[data-skin="fern"]::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-color: var(--frond);
+  --frond-mask: url('fern-frond.svg');
+  -webkit-mask-image: var(--frond-mask);
+  mask-image: var(--frond-mask);
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-size: auto min(76vh, 760px);
+  mask-size: auto min(76vh, 760px);
+  -webkit-mask-position: -2vw calc(100% + 24px);
+  mask-position: -2vw calc(100% + 24px);
+}
+[data-skin="fern"]::after {
+  transform: rotate(180deg);
+  -webkit-mask-size: auto min(54vh, 540px);
+  mask-size: auto min(54vh, 540px);
+  -webkit-mask-position: -1vw calc(100% + 16px);
+  mask-position: -1vw calc(100% + 16px);
+}
 
 /* Top bar controls sit on the linen like small paper tabs. */
 [data-skin="fern"] .lang-switch,
@@ -128,4 +160,5 @@
 
 @media (max-width: 640px) {
   [data-skin="fern"] .channel { padding: 22px 22px 22px 24px; }
+  [data-skin="fern"]::after { display: none; }
 }

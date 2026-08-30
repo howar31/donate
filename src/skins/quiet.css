@@ -1,8 +1,8 @@
-/* Skin: porcelain. Modern minimal: tonal neutral ground, white cards with large radii, soft
+/* Skin: quiet. Modern minimal, deliberately without any ornament or scene: tonal neutral ground, white cards with large radii, soft
    layered shadows and an inset highlight, a circular arrow chip; Geist only.
    Token contract: see src/skins/nebula.css. */
 
-:root[data-skin="porcelain"] {
+:root[data-skin="quiet"] {
   --font-body: 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang TC', 'Microsoft JhengHei', 'Noto Sans TC', 'Noto Sans CJK TC', sans-serif;
   --font-display: var(--font-body);
   --font-label: var(--font-body);
@@ -35,7 +35,7 @@
   --shadow-hover: inset 0 1px 0 #ffffff, 0 2px 4px rgba(0, 0, 0, 0.04), 0 18px 40px rgba(0, 0, 0, 0.09);
 }
 @media (prefers-color-scheme: dark) {
-  :root[data-skin="porcelain"]:not([data-theme="light"]) {
+  :root[data-skin="quiet"]:not([data-theme="light"]) {
     color-scheme: dark;
     --bg: #111113;
     --ground-a: #141416;
@@ -53,7 +53,7 @@
     --shadow-hover: inset 0 1px 0 rgba(255, 255, 255, 0.05), 0 2px 4px rgba(0, 0, 0, 0.4), 0 18px 40px rgba(0, 0, 0, 0.45);
   }
 }
-:root[data-skin="porcelain"][data-theme="dark"] {
+:root[data-skin="quiet"][data-theme="dark"] {
   color-scheme: dark;
   --bg: #111113;
   --ground-a: #141416;
@@ -72,26 +72,26 @@
 }
 
 /* Tonal ground: a barely-there vertical gradient instead of a flat fill. */
-[data-skin="porcelain"] body {
+[data-skin="quiet"] body {
   background: linear-gradient(180deg, var(--ground-a) 0%, var(--ground-b) 100%) fixed, var(--bg);
 }
 
 /* Top bar controls share the card material. */
-[data-skin="porcelain"] .lang-switch,
-[data-skin="porcelain"] .theme-switch {
+[data-skin="quiet"] .lang-switch,
+[data-skin="quiet"] .theme-switch {
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04), 0 4px 12px rgba(0, 0, 0, 0.04);
 }
 
 /* Cards lift on hover; the press keeps its downward feel. */
-[data-skin="porcelain"] .channel {
+[data-skin="quiet"] .channel {
   padding: 26px 26px 26px 30px;
   transition: border-color 0.15s ease, box-shadow 0.2s ease, transform 0.15s ease;
 }
-[data-skin="porcelain"] .channel:hover { transform: translateY(-1px); box-shadow: var(--shadow-hover); }
-[data-skin="porcelain"] .channel:active { transform: translateY(0); box-shadow: var(--shadow); }
+[data-skin="quiet"] .channel:hover { transform: translateY(-1px); box-shadow: var(--shadow-hover); }
+[data-skin="quiet"] .channel:active { transform: translateY(0); box-shadow: var(--shadow); }
 
 /* Arrow chip: a soft disc that inverts on hover. */
-[data-skin="porcelain"] .channel svg {
+[data-skin="quiet"] .channel svg {
   box-sizing: content-box;
   padding: 9px;
   border-radius: 999px;
@@ -99,8 +99,8 @@
   color: var(--ink);
   transition: background-color 0.15s ease, color 0.15s ease;
 }
-[data-skin="porcelain"] .channel:hover svg { background: var(--ink); color: var(--surface); }
+[data-skin="quiet"] .channel:hover svg { background: var(--ink); color: var(--surface); }
 
 @media (max-width: 640px) {
-  [data-skin="porcelain"] .channel { padding: 22px 20px 22px 22px; }
+  [data-skin="quiet"] .channel { padding: 22px 20px 22px 22px; }
 }

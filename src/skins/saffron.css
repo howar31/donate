@@ -1,6 +1,8 @@
-/* Skin: saffron. Poster print: solid golden ground, near-black ink, 2px strokes, hard offset
-   shadows, left-aligned hero hung from a thick rule; dark is warm graphite with the same strokes in
-   mustard gold. Archivo Black + Archivo.
+/* Skin: saffron. Site notice: solid golden ground, near-black ink, 2px strokes, hard offset
+   shadows, left-aligned hero hung from a hazard tape, a tower crane looming in close-up at the right edge,
+   hoisting; dark is the site at night: blue-black sky, the crane floodlit from below, a lit
+   cab, strokes in mustard. Archivo Black +
+   Archivo.
    Token contract: see src/skins/nebula.css. */
 
 :root[data-skin="saffron"] {
@@ -35,44 +37,59 @@
   --chip: #171300;
   --chip-ink: #f6c945;
   --stroke: #171300;
+  --site: rgba(23, 19, 0, 0.13);
+  --crane-paint: var(--site);
+  --cab: transparent;
+  --flood-a: transparent;
+  --flood-b: transparent;
 }
 @media (prefers-color-scheme: dark) {
   :root[data-skin="saffron"]:not([data-theme="light"]) {
     color-scheme: dark;
-    --bg: #1b1a17;
-    --surface: #252420;
-    --ink: #e6e3d8;
-    --muted: #b5b2a6;
-    --faint: #8a877c;
-    --line: #c9a83a;
-    --line-hover: #d8b644;
-    --accent: #d8b644;
-    --region: #c9a83a;
+    --bg: #121417;
+    --surface: #1c1f24;
+    --ink: #ece6d2;
+    --muted: #b9b3a0;
+    --faint: #8c8776;
+    --line: #d8b644;
+    --line-hover: #f0cc4e;
+    --accent: #f0cc4e;
+    --region: #d8b644;
     --shadow: 4px 4px 0 #8c7524;
     --shadow-hover: 6px 6px 0 #8c7524;
     --shadow-active: 2px 2px 0 #8c7524;
     --chip: #d8b644;
-    --chip-ink: #1b1a17;
-    --stroke: #c9a83a;
+    --chip-ink: #121417;
+    --stroke: #d8b644;
+    --site: rgba(216, 182, 68, 0.22);
+    --crane-paint: radial-gradient(70% 95% at 4% 100%, rgba(255, 208, 112, 0.6), rgba(216, 182, 68, 0.28) 65%);
+    --cab: rgba(255, 200, 100, 0.9);
+    --flood-a: rgba(255, 176, 64, 0.2);
+    --flood-b: rgba(255, 196, 96, 0.14);
   }
 }
 :root[data-skin="saffron"][data-theme="dark"] {
   color-scheme: dark;
-  --bg: #1b1a17;
-  --surface: #252420;
-  --ink: #e6e3d8;
-  --muted: #b5b2a6;
-  --faint: #8a877c;
-  --line: #c9a83a;
-  --line-hover: #d8b644;
-  --accent: #d8b644;
-  --region: #c9a83a;
+  --bg: #121417;
+  --surface: #1c1f24;
+  --ink: #ece6d2;
+  --muted: #b9b3a0;
+  --faint: #8c8776;
+  --line: #d8b644;
+  --line-hover: #f0cc4e;
+  --accent: #f0cc4e;
+  --region: #d8b644;
   --shadow: 4px 4px 0 #8c7524;
   --shadow-hover: 6px 6px 0 #8c7524;
   --shadow-active: 2px 2px 0 #8c7524;
   --chip: #d8b644;
-  --chip-ink: #1b1a17;
-  --stroke: #c9a83a;
+  --chip-ink: #121417;
+  --stroke: #d8b644;
+  --site: rgba(216, 182, 68, 0.22);
+  --crane-paint: radial-gradient(70% 95% at 4% 100%, rgba(255, 208, 112, 0.6), rgba(216, 182, 68, 0.28) 65%);
+  --cab: rgba(255, 200, 100, 0.9);
+  --flood-a: rgba(255, 176, 64, 0.2);
+  --flood-b: rgba(255, 196, 96, 0.14);
 }
 
 /* Top bar controls: same 2px stroke and a small hard shadow. */
@@ -85,11 +102,15 @@
 [data-skin="saffron"] .theme-switch:hover { border-color: var(--stroke); }
 [data-skin="saffron"] .lang-switch button[aria-pressed="true"] { background: var(--stroke); color: var(--bg); }
 
-/* Hero: left-aligned, hung from a thick rule the cards line up under. */
+/* Hero: left-aligned, hung from a hazard tape (two rules around a diagonal stripe) the cards
+   line up under. */
 [data-skin="saffron"] .hero {
   text-align: left;
-  padding-bottom: 20px;
-  border-bottom: 4px solid var(--stroke);
+  padding-bottom: 28px;
+  background:
+    linear-gradient(var(--stroke), var(--stroke)) 0 100% / 100% 2px no-repeat,
+    repeating-linear-gradient(-45deg, var(--stroke) 0 9px, transparent 9px 18px) 0 calc(100% - 2px) / 100% 8px no-repeat,
+    linear-gradient(var(--stroke), var(--stroke)) 0 calc(100% - 10px) / 100% 2px no-repeat;
 }
 [data-skin="saffron"] h1 { text-transform: uppercase; color: var(--stroke); }
 [data-skin="saffron"] .lede { margin: 0; }
@@ -136,6 +157,111 @@
   box-shadow: inset 0 0 0 2px var(--stroke);
 }
 
+/* Tower crane (tools/saffron-crane.py), seen up close: the tile is drawn 2.4 viewport heights
+   tall and mirrored, so the mast fills the right edge, the jib crosses the top of the page
+   just under the controls and everything else bleeds off-frame. --crane-h is the tile height,
+   --jib-y where the jib's top chord sits, --crane-x a horizontal nudge, --trolley-x where the
+   trolley sits along the jib. */
+[data-skin="saffron"] { --crane-h: max(240vh, 150vw); --jib-y: 84px; --crane-x: 0px; --trolley-x: 16vw; }
+[data-skin="saffron"] .topbar,
+[data-skin="saffron"] main,
+[data-skin="saffron"] footer { position: relative; z-index: 1; }
+[data-skin="saffron"]::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  transform: scaleX(-1);
+  background: var(--crane-paint);
+  --crane-mask: url('saffron-crane.svg');
+  -webkit-mask-image: var(--crane-mask);
+  mask-image: var(--crane-mask);
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: var(--crane-x) calc(var(--jib-y) - var(--crane-h) * 0.106);
+  mask-position: var(--crane-x) calc(var(--jib-y) - var(--crane-h) * 0.106);
+  -webkit-mask-size: auto var(--crane-h);
+  mask-size: auto var(--crane-h);
+}
+
+/* Night: the cab's glazing glows in four panes. The element is three times the window and
+   masked: the window polygon (the tile's cut-out, mirrored) minus the mullions, plus a halo
+   ring that starts outside the glass so the frame stays dark. Transparent in the light theme.
+   Window in tile units: x 129 to 150, y 82 to 106; the front is vertical for the top 10 units
+   and leans out below, exactly like the cut-out. */
+[data-skin="saffron"] body::before {
+  content: '';
+  position: fixed;
+  z-index: -1;
+  pointer-events: none;
+  right: calc(var(--crane-h) * 0.108 + var(--crane-x));
+  top: calc(var(--jib-y) - var(--crane-h) * 0.048);
+  width: calc(var(--crane-h) * 0.063);
+  height: calc(var(--crane-h) * 0.072);
+  background: var(--cab);
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 21 24'%3E%3Cpath d='M5 0H10V11H4.64L5 10Z M12 0H21V11H12Z M10 13V24H0L3.93 13Z M12 13H21V24H12Z'/%3E%3C/svg%3E"), radial-gradient(closest-side, transparent 40%, rgba(0, 0, 0, 0.42) 47%, transparent 100%);
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 21 24'%3E%3Cpath d='M5 0H10V11H4.64L5 10Z M12 0H21V11H12Z M10 13V24H0L3.93 13Z M12 13H21V24H12Z'/%3E%3C/svg%3E"), radial-gradient(closest-side, transparent 40%, rgba(0, 0, 0, 0.42) 47%, transparent 100%);
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: 50% 50%, 50% 50%;
+  mask-position: 50% 50%, 50% 50%;
+  -webkit-mask-size: calc(var(--crane-h) * 0.021) calc(var(--crane-h) * 0.024), 100% 100%;
+  mask-size: calc(var(--crane-h) * 0.021) calc(var(--crane-h) * 0.024), 100% 100%;
+}
+[data-skin="saffron"] body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(60vw 48vh at 92% 100%, var(--flood-a), transparent 70%),
+    radial-gradient(44vw 40vh at 86% 0%, var(--flood-b), transparent 70%);
+}
+
+/* Trolley, rope falls and hook block, all sized from --crane-h so they stay in proportion
+   with the crane: the trolley rides the jib's flat bottom chord at --trolley-x, two ropes run
+   down to the sheave block (saffron-hook.svg), and the rope length is hoisted over 50 s. */
+[data-skin="saffron"]::before {
+  content: '';
+  position: fixed;
+  z-index: -1;
+  pointer-events: none;
+  left: var(--trolley-x);
+  top: calc(var(--jib-y) + var(--crane-h) * 0.022);
+  width: calc(var(--crane-h) * 0.05);
+  margin-left: calc(var(--crane-h) * -0.025);
+  height: calc(var(--crane-h) * 0.14);
+  background-color: var(--site);
+  --hook-mask: url('saffron-hook.svg');
+  -webkit-mask-image:
+    linear-gradient(#000, #000), linear-gradient(#000, #000), linear-gradient(#000, #000),
+    linear-gradient(#000, #000), linear-gradient(#000, #000), var(--hook-mask);
+  mask-image:
+    linear-gradient(#000, #000), linear-gradient(#000, #000), linear-gradient(#000, #000),
+    linear-gradient(#000, #000), linear-gradient(#000, #000), var(--hook-mask);
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: 50% 0, 0 calc(var(--crane-h) * 0.008), 100% calc(var(--crane-h) * 0.008), 38% 0, 62% 0, 50% 100%;
+  mask-position: 50% 0, 0 calc(var(--crane-h) * 0.008), 100% calc(var(--crane-h) * 0.008), 38% 0, 62% 0, 50% 100%;
+  -webkit-mask-size:
+    100% calc(var(--crane-h) * 0.008), calc(var(--crane-h) * 0.01) calc(var(--crane-h) * 0.014),
+    calc(var(--crane-h) * 0.01) calc(var(--crane-h) * 0.014), calc(var(--crane-h) * 0.003) calc(100% - var(--crane-h) * 0.057),
+    calc(var(--crane-h) * 0.003) calc(100% - var(--crane-h) * 0.057), calc(var(--crane-h) * 0.03) auto;
+  mask-size:
+    100% calc(var(--crane-h) * 0.008), calc(var(--crane-h) * 0.01) calc(var(--crane-h) * 0.014),
+    calc(var(--crane-h) * 0.01) calc(var(--crane-h) * 0.014), calc(var(--crane-h) * 0.003) calc(100% - var(--crane-h) * 0.057),
+    calc(var(--crane-h) * 0.003) calc(100% - var(--crane-h) * 0.057), calc(var(--crane-h) * 0.03) auto;
+  animation: saffron-hoist 50s ease-in-out -18s infinite alternate;
+}
+@keyframes saffron-hoist {
+  from { height: calc(var(--crane-h) * 0.12); }
+  to { height: calc(var(--crane-h) * 0.3); }
+}
+
 @media (max-width: 640px) {
   [data-skin="saffron"] .channel { padding: 20px 20px 20px 22px; }
+  [data-skin="saffron"] { --crane-h: 200vh; --jib-y: 46px; --crane-x: -118px; }
+  [data-skin="saffron"]::before { display: none; }
 }

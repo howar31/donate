@@ -4,7 +4,9 @@ Asserts, per skin: the 10 colour tokens in all three colour blocks (light, syste
 forced dark), the 14 type/shape tokens once, every skin-specific extra token defined in the
 light block also defined in both dark blocks, no !important, no adblock-bait identifiers.
 Also cross-checks src/index.html: every skin file has a SKINS entry and vice versa, and the
-skins region is empty (the build fills it; generated CSS must never be committed there).
+skins region is empty (the build fills it; generated CSS must never be committed there),
+and the og:image link preview points at a JPEG shipped from src/ whose real size matches the
+declared og:image:width/height.
 Static companion to tests/verify.js (which needs a browser); run from the repo root:
 
     python3 tests/tokens.py
@@ -56,4 +58,33 @@ region=re.search(r'/\* skins:begin \*/(.*?)/\* skins:end \*/',html,re.S)
 ok=bool(region) and not region.group(1).strip()
 print('skins region', 'OK (empty, filled by the build)' if ok else 'PROBLEMS: missing markers or generated content committed in src/index.html')
 failed |= not ok
+
+# link preview: og:image must be an absolute site URL to a JPEG in src/ (the build copies it
+# as is) and the declared width/height must be the file's real size (platforms trust them)
+def meta(prop):
+    m=re.search(r'<meta property="%s" content="([^"]*)"'%re.escape(prop),html)
+    return m.group(1) if m else ''
+def jpeg_size(data):
+    # walk the segments to the first SOF marker (baseline C0, extended C1, progressive C2)
+    i=2
+    while i+9<len(data) and data[i]==0xFF:
+        marker,length=data[i+1],int.from_bytes(data[i+2:i+4],'big')
+        if marker in (0xC0,0xC1,0xC2): return int.from_bytes(data[i+7:i+9],'big'),int.from_bytes(data[i+5:i+7],'big')
+        i+=2+length
+    return None
+probs=[]
+origin='https://donate.howar31.com/'
+image=meta('og:image')
+if not image.startswith(origin): probs.append('og:image is not an absolute %s URL'%origin)
+else:
+    path='src/'+image[len(origin):]
+    try: size=jpeg_size(open(path,'rb').read())
+    except OSError: size=None; probs.append('%s missing'%path)
+    else:
+        if size is None: probs.append('%s is not a JPEG'%path)
+    declared=(meta('og:image:width'),meta('og:image:height'))
+    if size and declared!=(str(size[0]),str(size[1])):
+        probs.append('og:image:width/height %sx%s but %s is %dx%d'%(declared[0],declared[1],path,size[0],size[1]))
+print('og:image', 'OK' if not probs else 'PROBLEMS: ' + '; '.join(probs))
+failed |= bool(probs)
 sys.exit(1 if failed else 0)

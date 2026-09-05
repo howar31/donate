@@ -170,6 +170,14 @@
     }
     .channel h2:lang(en) { font-weight: var(--name-weight-latin); }
     .channel-note { font-size: var(--font-size-note); color: var(--faint); }
+    .channel-hint {
+      margin-top: 2px;
+      font-size: 0.75rem;
+      color: var(--faint);
+      opacity: 0.55;
+      line-height: 1.5;
+      text-wrap: pretty;
+    }
     .channel svg { color: var(--accent); transition: transform 0.2s ease; }
 
     .paypal-link {
@@ -200,6 +208,7 @@
       .channel { padding: 20px 22px; }
       .channel h2 { font-size: 1.5rem; }
       .channel-note { font-size: 0.875rem; }
+      .channel-hint { font-size: 0.6875rem; }
       footer { text-align: left; }
     }
     @media (prefers-reduced-motion: reduce) {
@@ -338,6 +347,7 @@
         <div class="region" data-i18n="ecpayRegion">台灣</div>
         <h2 data-i18n="ecpayName">綠界 ECPay</h2>
         <div class="channel-note" data-i18n="ecpayNote">信用卡 · Apple Pay · 台幣</div>
+        <div class="channel-hint" data-i18n="ecpayHint">Ko-fi 與 PayPal 不受理台灣境內付款，台灣信用卡請由綠界刷卡。</div>
       </div>
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg>
     </a>
@@ -374,6 +384,7 @@
           ecpayRegion: '台灣',
           ecpayName: '綠界 ECPay',
           ecpayNote: '信用卡 · Apple Pay · 台幣',
+          ecpayHint: 'Ko-fi 與 PayPal 不受理台灣境內付款，台灣信用卡請由綠界刷卡。',
           kofiRegion: '國際',
           kofiName: 'Ko-fi',
           kofiNote: 'PayPal · 美元',
@@ -390,6 +401,7 @@
           ecpayRegion: 'Taiwan',
           ecpayName: 'ECPay 綠界',
           ecpayNote: 'Credit card · Apple Pay · TWD',
+          ecpayHint: 'Ko-fi and PayPal do not take Taiwan-domestic payments, so cards issued in Taiwan go through ECPay.',
           kofiRegion: 'International',
           kofiName: 'Ko-fi',
           kofiNote: 'PayPal · USD',
